@@ -16,9 +16,15 @@ import java.util.Scanner;
  */
 public class motorPH {
 
+
+
+    /* =====================================================
+                        Login System (Main Method)
+    ===================================================== */
     public static void main(String[] args) {
 
         Scanner sc = new Scanner(System.in);
+    
 
         System.out.print("Enter username: ");
         String username = sc.nextLine();
@@ -35,7 +41,7 @@ public class motorPH {
 
         if (username.equals("e")) {
             if (password.equals("1")) {
-                employeeMenu();
+                employeeMenu(sc);
             } else {
                 System.out.println("\nIncorrect password!");
                 System.out.println("Program terminated.\n");
@@ -43,7 +49,7 @@ public class motorPH {
 
         } else if (username.equals("s")) {
             if (password.equals("12")) {
-                staffMenu();
+                staffMenu(sc);
             } else {
                 System.out.println("\nIncorrect password!");
                 System.out.println("Program terminated.\n");
@@ -53,7 +59,81 @@ public class motorPH {
         sc.close();
     }
 
-    // Calculate Hours Worked
+
+
+     /* =====================================================
+                        Employee View Details (method 3)
+    ===================================================== */
+
+    public static void employeeDetails(Scanner sc) {
+
+       
+
+        System.out.print("Enter your employee number: ");
+        String number = sc.nextLine();
+        System.out.println();
+
+        boolean found = false;
+
+        String fileforemployee = "MO-IT101-Group24.test/src/details.csv";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(fileforemployee))) {
+
+            br.readLine(); // skip header
+            String line;
+
+            while ((line = br.readLine()) != null) {
+
+                if (line.trim().isEmpty()) continue;
+
+                String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+
+                String employeeNo = data[0].trim();
+
+
+                if (employeeNo.equals(number)) {
+
+                    found = true;
+
+                    String fullName = data[1] + ", " + data[2];
+                    String birthday = data[3];
+
+                    // employee details
+                    System.out.println("===================================================================");
+                    System.out.printf("%40s%n", "Employee Details");
+                    System.out.println("===================================================================");
+
+                    System.out.println("Employee No.: " + employeeNo);
+                    System.out.println("Employee Name: " + fullName);
+                    System.out.println("Employee Birthday: " + birthday);
+                    System.out.println("___________________________________________________________________");
+
+                    break;
+                }
+            }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                if (!found) {
+                    System.out.println("\n");
+                    System.out.println("Employee number does not exist.");
+                    System.out.println("\n");
+                }
+
+       
+    }
+
+
+
+
+
+    
+/* =====================================================
+                        Calculate Hours Worked (method 1)
+    ===================================================== */
+    
     static double computeHours(LocalTime login, LocalTime logout) {
 
         LocalTime graceTime = LocalTime.of(8, 10);
@@ -262,11 +342,10 @@ public static double withholdingTax(double taxableIncome) {
 
         
 
-    // __________________LOGIN SYSTEM________________________
-        
-    public static void employeeMenu() {
+    // for Employees
+    public static void employeeMenu(Scanner sc) {
 
-        Scanner sc = new Scanner(System.in);
+       
 
         System.out.println("\n1. View Employee Details");
         System.out.println("2. Exit");
@@ -276,7 +355,7 @@ public static double withholdingTax(double taxableIncome) {
         sc.nextLine();
 
             if (choice == 1) {
-                        employeeDetails();
+                        employeeDetails(sc);
 
                 } else if (choice == 2) {
 
@@ -284,80 +363,18 @@ public static double withholdingTax(double taxableIncome) {
                     System.out.println("\nThank You for using MotorPH Payroll System!");
                     System.out.println("\n");
             }
-        sc.close();
+        
     }
 
-    /* =====================================================
-                        Employee View Details (method 3)
-    ===================================================== */
-
-    public static void employeeDetails() {
-
-        Scanner sc = new Scanner(System.in);
-
-        System.out.print("Enter your employee number: ");
-        String number = sc.nextLine();
-        System.out.println();
-
-        boolean found = false;
-
-        String fileforemployee = "MO-IT101-Group24.test/src/details.csv";
-
-        try (BufferedReader br = new BufferedReader(new FileReader(fileforemployee))) {
-
-            br.readLine(); // skip header
-            String line;
-
-            while ((line = br.readLine()) != null) {
-
-                if (line.trim().isEmpty()) continue;
-
-                String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
-
-                String employeeNo = data[0].trim();
-
-
-                if (employeeNo.equals(number)) {
-
-                    found = true;
-
-                    String fullName = data[1] + ", " + data[2];
-                    String birthday = data[3];
-
-                    // employee details
-                    System.out.println("===================================================================");
-                    System.out.printf("%40s%n", "Employee Details");
-                    System.out.println("===================================================================");
-
-                    System.out.println("Employee No.: " + employeeNo);
-                    System.out.println("Employee Name: " + fullName);
-                    System.out.println("Employee Birthday: " + birthday);
-                    System.out.println("___________________________________________________________________");
-
-                    break;
-                }
-            }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                if (!found) {
-                    System.out.println("\n");
-                    System.out.println("Employee number does not exist.");
-                    System.out.println("\n");
-                }
-
-        sc.close();
-    }
+   
 
     /* =====================================================
                 Payroll Access Menu (method 3)
     ===================================================== */
 
-    public static void staffMenu() {
+    public static void staffMenu(Scanner sc) {
 
-        Scanner sc = new Scanner(System.in);
+        
 
         System.out.println("\n1. Process Payroll");
         System.out.println("2. Exit the program");
@@ -378,11 +395,11 @@ public static double withholdingTax(double taxableIncome) {
 
             if (option == 1) {
 
-                oneEmployee();
+                oneEmployee(sc);
 
             } else if (option == 2) {
 
-                allEmployee();
+                allEmployee(sc);
                          
 
             } else if (option == 3) {
@@ -397,15 +414,15 @@ public static double withholdingTax(double taxableIncome) {
                 System.out.println("Thank You for using MotorPH Payroll System!");
                 System.out.println("\n");
             }
-        sc.close();
+        
     }
 
-    public static void oneEmployee () {
+    public static void oneEmployee (Scanner sc) {
 
         String empFile = "MO-IT101-Group24.test/src/details.csv";
         String attFile = "MO-IT101-Group24.test/src/attendance.csv";
 
-        Scanner sc = new Scanner(System.in);
+    
 
         System.out.print("Enter Employee #: ");
         String inputEmpNo = sc.nextLine();
@@ -553,10 +570,10 @@ public static double withholdingTax(double taxableIncome) {
             System.out.println("Net Salary: " + netSalary);
         }
 
-        sc.close();
+        
     }
 
-    public static void allEmployee() {
+    public static void allEmployee(Scanner sc) {
 
         String empFile = "MO-IT101-Group24.test/src/details.csv";
         String attFile = "MO-IT101-Group24.test/src/attendance.csv";
