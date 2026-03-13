@@ -10,7 +10,7 @@ public class MotorPH_PayrollSystem {
     
     public static void main(String[] args) {
 
-        String empInfo = "C:\\Users\\annma\\Downloads\\VSCodeProjects\\empInfo.csv";
+        String empInfo = "Ann's/resources/empInfo.csv";
         String empAttendance = "C:\\Users\\annma\\Downloads\\VSCodeProjects\\empAttendance.csv";
         String sssContribution = "C:\\Users\\annma\\Downloads\\VSCodeProjects\\SSS Contribution - SSS.csv";
         
