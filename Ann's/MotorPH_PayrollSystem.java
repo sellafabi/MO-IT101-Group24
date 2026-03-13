@@ -11,7 +11,7 @@ public class MotorPH_PayrollSystem {
     public static void main(String[] args) {
 
         String empInfo = "Ann's/resources/empInfo.csv";
-        String empAttendance = "C:\\Users\\annma\\Downloads\\VSCodeProjects\\empAttendance.csv";
+        String empAttendance = "Ann's/resources/empAttendance.csv";
         String sssContribution = "C:\\Users\\annma\\Downloads\\VSCodeProjects\\SSS Contribution - SSS.csv";
         
         Scanner sc = new Scanner(System.in);
