@@ -120,9 +120,9 @@ public class MotorPH {
                             
 
                                 if (subOption.equals("1")){
-                                    System.out.println("Enter Employee #: ");
-                                    // int enterEmpNumber = sc.nextInt();
-                                    sc.nextLine();
+                                    // System.out.println("Enter Employee #: ");
+                                    // // int enterEmpNumber = sc.nextInt();
+                                    // sc.nextLine();
                                     oneEmployee(sc);;
 
                                 } else if (subOption.equals("2")){
