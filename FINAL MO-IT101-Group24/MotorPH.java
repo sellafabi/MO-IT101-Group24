@@ -15,8 +15,6 @@ public class MotorPH {
   public static void main(String[] args) {
 
         String empInfo = "FINAL MO-IT101-Group24/src/details.csv";
-        // String empAttendance = "Ann's/resources/empAttendance.csv";
-        // String sssContribution = "Ann's/resources/SSS Contribution - SSS.csv";
         
         Scanner sc = new Scanner(System.in);
 
@@ -90,7 +88,7 @@ public class MotorPH {
                                         } else {
                                             System.out.println("Employee does not exist.");
                                         }
-                                    enterEmpNum.close(); /* closing the empnum scanner (test) */
+                                    enterEmpNum.close(); 
                                     } else if (option.equals("2")){
                                         System.out.println("Exiting program.");
                                         System.exit(0);
@@ -104,8 +102,8 @@ public class MotorPH {
                 if (username.equals(payrollUsername) && inputPassword.equals(password)) {
                     System.out.println("Payroll staff Login successful.");
 
-                    String option; //= "";
-                    String subOption; //= "";
+                    String option; 
+                    String subOption;
 
                     System.out.println("1.Process Payroll");
                     System.out.println("2. Exit program");
@@ -120,9 +118,6 @@ public class MotorPH {
                             
 
                                 if (subOption.equals("1")){
-                                    // System.out.println("Enter Employee #: ");
-                                    // // int enterEmpNumber = sc.nextInt();
-                                    // sc.nextLine();
                                     oneEmployee(sc);;
 
                                 } else if (subOption.equals("2")){
@@ -138,7 +133,7 @@ public class MotorPH {
                             System.exit(0);
                         }
                     } else if (!username.equals(payrollUsername) && !inputPassword.equals(password)) {
-                    System.out.println("Incorrect credentials.");
+                    System.out.println("Incorrect credentials."); /*if the user enters the wrong username and password*/
                 }
                 sc.close();
             } 
@@ -252,8 +247,8 @@ public class MotorPH {
     ===================================================== */
     public static double withholdingTax (double totalGross, double totalContribution) {
         double tax = 0.00;
-        double taxableSalary = totalGross - totalContribution;
-
+        double taxableSalary = totalGross - totalContribution; /* retrieves the taxable salary by deducting all of the govt contributions to the gross*/
+        
         if (totalGross <= 20832) {
             tax = 0.00;
         } else if (totalGross >= 20833 && totalGross < 33333) {
@@ -306,15 +301,6 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
         static double computeGross(double hours, double rate) {
             return hours * rate;
         }
-
-
-
-
-
-
-
-
-
 
       
             //       sss DETAILS [rosella]
