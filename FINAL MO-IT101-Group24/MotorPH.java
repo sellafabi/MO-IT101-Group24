@@ -14,7 +14,7 @@ import java.util.Scanner;
 public class MotorPH {
 
     /* ============================
-        MAIN METHOD [ann]
+        Login System (MAIN METHOD) [ann]
     ===============================*/
     public static void main(String[] args) {
 
