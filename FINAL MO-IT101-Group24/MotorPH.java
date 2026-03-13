@@ -273,7 +273,33 @@ public class MotorPH {
         }
         return tax;
 }   
+/* =====================================================
+       Hours Worked Computation (method)
+    ===================================================== */
+public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
+            LocalTime gracePeriod = LocalTime.of(8, 10); // 8:00 AM - 8:10 AM
+            LocalTime cutoffTime = LocalTime.of(17, 0); // 5:00 PM
 
+
+            if (logOut.isAfter(cutoffTime)) {
+                logOut = cutoffTime; // limits logout time at 5:00 PM
+            }
+
+            long  minutesWorked = Duration.between(logIn, logOut).toMinutes(); //calculates the duration between log in and log out time.
+            int lunchBreak = 60; // 1 hour lunch break
+            if (minutesWorked > lunchBreak) {
+                minutesWorked -= lunchBreak; // deducts 1 hour for lunch break if total minutes worked is more than 1 hour.
+            } else {
+                minutesWorked = 0; // if total minutes worked is less than or equal to 1 hour, then no hours are counted.
+            }
+
+            double hoursWorked = minutesWorked;
+
+            if (!logIn.isAfter(gracePeriod)) {
+                return 8.0; // if log in time is before or at 8:10 AM, counts as 8 hours worked.
+            }
+            return hoursWorked / 60.0; // converts minutes worked to hours.
+        }
 
 
 
