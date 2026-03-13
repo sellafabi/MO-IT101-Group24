@@ -14,9 +14,9 @@ import java.util.Scanner;
 public class MotorPH {
   public static void main(String[] args) {
 
-        String empInfo = "Ann's/resources/empInfo.csv";
-        String empAttendance = "Ann's/resources/empAttendance.csv";
-        String sssContribution = "Ann's/resources/SSS Contribution - SSS.csv";
+        String empInfo = "FINAL MO-IT101-Group24/src/details.csv";
+        // String empAttendance = "Ann's/resources/empAttendance.csv";
+        // String sssContribution = "Ann's/resources/SSS Contribution - SSS.csv";
         
         Scanner sc = new Scanner(System.in);
 
@@ -121,12 +121,12 @@ public class MotorPH {
 
                                 if (subOption.equals("1")){
                                     System.out.println("Enter Employee #: ");
-                                    int enterEmpNumber = sc.nextInt();
+                                    // int enterEmpNumber = sc.nextInt();
                                     sc.nextLine();
-                                    viewOneEmp(enterEmpNumber, empInfo, empAttendance, sssContribution);
+                                    oneEmployee(sc);;
 
                                 } else if (subOption.equals("2")){
-                                    viewAllEmp(empInfo, empAttendance, sssContribution);
+                                    allEmployee(sc);;
 
                                 } else if (subOption.equals("3")){
                                     System.out.println("Exiting program.");
@@ -143,13 +143,13 @@ public class MotorPH {
                 sc.close();
             } 
 
-            /* =====================================================
+    /* =====================================================
                         SSS computation (method 4) [rosella]
     ===================================================== */
  
     public static double computeSSS(double monthlyGross) {
 
-                String file = "MO-IT101-Group24.test/src/sss.csv";
+                String file = "FINAL MO-IT101-Group24/src/sss.csv";
                 double lastEmployeeShare = 0;
 
                 try (BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -199,7 +199,7 @@ public class MotorPH {
 
     public static double computePagibig(double monthlyGross) {
 
-                String file = "MO-IT101-Group24.test/src/pagibig.csv";
+                String file = "FINAL MO-IT101-Group24/src/pagibig.csv";
                 double contribution = 0;
 
                 try (BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -233,7 +233,7 @@ public class MotorPH {
  /* =====================================================
         PhilHealth Computation (method) [ann]
     ===================================================== */
-    public static double computePH (double totalGross) {
+    public static double computePhilhealth (double totalGross) {
         double PHdeduction = 0.0;
 
         if (totalGross <= 10000) {
@@ -250,7 +250,7 @@ public class MotorPH {
 /* =====================================================
        Tax Computation (method) [ann]
     ===================================================== */
-    public static double computeTax (double totalGross, double totalContribution) {
+    public static double withholdingTax (double totalGross, double totalContribution) {
         double tax = 0.00;
         double taxableSalary = totalGross - totalContribution;
 
@@ -299,6 +299,12 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
                 return 8.0; // if log in time is before or at 8:10 AM, counts as 8 hours worked.
             }
             return hoursWorked / 60.0; // converts minutes worked to hours.
+            
+        }
+
+
+        static double computeGross(double hours, double rate) {
+            return hours * rate;
         }
 
 
@@ -315,8 +321,8 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
 
     public static void oneEmployee (Scanner sc) {
 
-        String empFile = "MO-IT101-Group24.test/src/details.csv";
-        String attFile = "MO-IT101-Group24.test/src/attendance.csv";
+        String empFile = "FINAL MO-IT101-Group24/src/details.csv";
+        String attFile = "FINAL MO-IT101-Group24/src/attendance.csv";
 
     
 
@@ -330,10 +336,10 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
         boolean found = false;
         double rate = 0;
 
-                // Read Employee Details CSV
+    
         try (BufferedReader br = new BufferedReader(new FileReader(empFile))) {
 
-            br.readLine(); // Skip Header
+            br.readLine();
             String line;
 
             while ((line = br.readLine()) != null) {
@@ -370,16 +376,15 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
 
         DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
 
-        // Read Attendance Records CSV
-        // Nested loop: month ---> cutoff (1-15, 16-end-of-month)
-        for (int month = 6; month <= 12; month++) { // June to December 2024
+       
+        for (int month = 6; month <= 12; month++) { 
             double firstHalf = 0;
             double secondHalf = 0;
             int daysInMonth = YearMonth.of(2024, month).lengthOfMonth();
 
             try (BufferedReader br = new BufferedReader(new FileReader(attFile))) {
 
-                br.readLine(); // Skip Header
+                br.readLine(); 
                 String line;
 
                 while ((line = br.readLine()) != null) {
@@ -399,7 +404,7 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
                     LocalTime login = LocalTime.parse(data[4].trim(), timeFormat);
                     LocalTime logout = LocalTime.parse(data[5].trim(), timeFormat);
 
-                    double hours = computeHours(login, logout);
+                    double hours = computeHoursWorked(login, logout);
 
                     if (day <= 15) firstHalf += hours;
                     else secondHalf += hours;
@@ -412,31 +417,26 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
             }
 
             
-            // First cutoff gross
+            
             double grossFirst = computeGross(firstHalf, rate);
 
-            // Second cutoff gross
+            
             double grossSecond = computeGross(secondHalf, rate);
 
-            double monthlyGross = grossFirst + grossSecond; // ← total for the month
+            double monthlyGross = grossFirst + grossSecond; 
 
-            // Then call it:
+            
             double sss = computeSSS(monthlyGross);
-
-            //pagibig
             double pagibig = computePagibig(monthlyGross);
-
-            //philhealth
             double philhealth = computePhilhealth(monthlyGross);
 
-            //tax
-            double taxableIncome = monthlyGross - sss - philhealth - pagibig;
-            double tax = withholdingTax(taxableIncome);
+            double totalContribution = sss + philhealth + pagibig;
 
-            //total deductions
-            double totalDeductions = sss +  pagibig + philhealth + tax;
+            double tax = withholdingTax(monthlyGross, totalContribution); 
 
-            //net salary
+            double totalDeductions = sss + pagibig + philhealth + tax;
+
+            
             double netSalary = grossSecond - totalDeductions;
 
             String monthName = switch (month) {
@@ -471,11 +471,11 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
 
     public static void allEmployee(Scanner sc) {
 
-        String empFile = "MO-IT101-Group24.test/src/details.csv";
-        String attFile = "MO-IT101-Group24.test/src/attendance.csv";
+        String empFile = "FINAL MO-IT101-Group24/src/details.csv";
+        String attFile = "FINAL MO-IT101-Group24/src/attendance.csv";
         DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
 
-        // Step 1: Load ALL employees into a list
+        
         List<String[]> employees = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(empFile))) {
@@ -491,13 +491,13 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
             System.out.println("Error reading employee file.");
         }
 
-        // Step 2: Loop through each employee (repeats 34 times)
+        // Loop through each employee (repeats 34 times)
         for (String[] empData : employees) {
 
             String empNo     = empData[0];
             String lastName  = empData[1];
             String firstName = empData[2];
-            String birthday  = empData[3]; // adjust index if needed
+            String birthday  = empData[3]; 
             double rate      = Double.parseDouble(empData[18].trim());
 
             System.out.println("\n===================================");
@@ -506,7 +506,7 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
             System.out.println("Birthday : " + birthday);
             System.out.println("===================================");
 
-            // Step 3: Attendance loop per employee
+            // Attendance loop per employee
             for (int month = 6; month <= 12; month++) {
                 double firstHalf = 0;
                 double secondHalf = 0;
@@ -520,7 +520,7 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
                         if (line.trim().isEmpty()) continue;
                         String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
-                        if (!data[0].equals(empNo)) continue; // ← match THIS employee
+                        if (!data[0].equals(empNo)) continue; 
 
                         String[] dateParts = data[3].split("/");
                         int recordMonth = Integer.parseInt(dateParts[0]);
@@ -531,7 +531,7 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
 
                         LocalTime login  = LocalTime.parse(data[4].trim(), timeFormat);
                         LocalTime logout = LocalTime.parse(data[5].trim(), timeFormat);
-                        double hours = computeHours(login, logout);
+                        double hours = computeHoursWorked(login, logout);
 
                         if (day <= 15) firstHalf  += hours;
                         else           secondHalf += hours;
@@ -544,31 +544,26 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
 
                 String monthName = Month.of(month).toString();
 
-                // First cutoff gross
+                
                 double grossFirst = computeGross(firstHalf, rate);
 
-                // Second cutoff gross
+                
                 double grossSecond = computeGross(secondHalf, rate);
 
-                double monthlyGross = grossFirst + grossSecond; // ← total for the month
+                double monthlyGross = grossFirst + grossSecond; 
 
-                // Then call it:
+                
                 double sss = computeSSS(monthlyGross);
-
-                //pagibig
                 double pagibig = computePagibig(monthlyGross);
-
-                //philhealth
                 double philhealth = computePhilhealth(monthlyGross);
 
-                //withholding tax
-                double taxableIncome = monthlyGross - sss - philhealth - pagibig;
-                double tax = withholdingTax(taxableIncome);
+                double totalContribution = sss + philhealth + pagibig;
 
-                // total deductions
+                double tax = withholdingTax(monthlyGross, totalContribution);
+
                 double totalDeductions = sss + pagibig + philhealth + tax;
 
-                // net salary
+                
                 double netSalary = grossSecond - totalDeductions;
 
                 System.out.println("\nCutoff Date: " + monthName + " 1 to 15");
