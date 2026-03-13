@@ -12,239 +12,270 @@ import java.util.Scanner;
 
 
 public class MotorPH {
-  public static void main(String[] args) {
+
+    /* ============================
+        MAIN METHOD [ann]
+    ===============================*/
+    public static void main(String[] args) {
 
         String empInfo = "FINAL MO-IT101-Group24/src/details.csv";
-        
+            
         Scanner sc = new Scanner(System.in);
 
-        String payrollUsername = "payroll_staff";
-        
+        String payrollUsername = "payroll_staff";   
         String employeeUsername = "employee";
-
         String password = "12345";
 
-        System.out.println("Enter Username: ");
+        System.out.print("Enter Username: ");
         String username = sc.nextLine();
 
-        System.out.println("Enter Password: ");
+        System.out.print("Enter Password: ");
         String inputPassword = sc.nextLine();
 
         
 
 
-//EMPLOYEE LOGIN PROGRAM -- EMPLOYEE LOGIN PROGRAM -- EMPLOYEE LOGIN PROGRAM -- EMPLOYEE LOGIN PROGRAM -- EMPLOYEE LOGIN PROGRAM -- EMPLOYEE LOGIN PROGRAM
-                if (username.equals(employeeUsername) && inputPassword.equals(password)) {
-                    System.out.println("Employee login successful.");
+        //EMPLOYEE LOGIN PROGRAM -- EMPLOYEE LOGIN PROGRAM -- EMPLOYEE LOGIN PROGRAM -- EMPLOYEE LOGIN PROGRAM -- EMPLOYEE LOGIN PROGRAM -- EMPLOYEE LOGIN PROGRAM
+        if (username.equals(employeeUsername) && inputPassword.equals(password)) {
+            System.out.println("Employee login successful.\n");
 
-                    String option = "";
-            
-                    System.out.println("1. Enter your Employee Number");
-                    System.out.println("2. Exit program");
-
-                    option = sc.nextLine();
-
-                        if (option.equals("1")){
-                            Scanner enterEmpNum = new Scanner(System.in);
-                            System.out.println("Enter Employee #: ");
-                            String empNum = enterEmpNum.nextLine();
-                            enterEmpNum.close();
-
-                            String empNumber = "";
-                            String empLastName = "";
-                            String empFirstName = "";
-                            String empBirthday = "";
-                            boolean found = false;
-                            
-
-                                try (BufferedReader br = new BufferedReader (new FileReader (empInfo))){
-                                    br.readLine();
-                                    String line;
-                                        while ((line = br.readLine()) !=null){
-                                            if(line.trim().isEmpty()) continue;
-                                            String[] data = line.split(",");
-
-                                            if (data[0].equals(empNum)){
-                                                empNumber = data[0];
-                                                empLastName = data[1];
-                                                empFirstName  = data[2];
-                                                empBirthday = data[3];
-                                                found = true;
-                                                break;
-                                            }
-                                        }
-                                    } catch (IOException e) {
-                                        System.out.println("Employee file error.");
-                                        }
-                                        if (found){
-                                            System.out.println("\n=========================================================");
-                                            System.out.println( "Employee Information");
-                                            System.out.println("\n=========================================================");
-                                            System.out.println("Employee #: " + empNumber);
-                                            System.out.println("Employee Name: " + empLastName + ", " + empFirstName);
-                                            System.out.println("Employee Birthday: " + empBirthday);
-                                            System.out.println("\n=========================================================");
-                                            
-                                        } else {
-                                            System.out.println("Employee does not exist.");
-                                        }
-                                    enterEmpNum.close(); 
-                                    } else if (option.equals("2")){
-                                        System.out.println("Exiting program.");
-                                        System.exit(0);
-                                    }
-                } else if (!username.equals(employeeUsername) && !inputPassword.equals(password)) {
-                    System.out.println("Incorrect credentials.");
-                }
+            String option = "";
                 
+            System.out.println("1. Enter your Employee Number");
+            System.out.println("2. Exit program");
+            System.out.print("Choose Option: ");
+            option = sc.nextLine();
 
-//PAYROLL LOGIN PROGRAM -- PAYROLL LOGIN PROGRAM -- PAYROLL LOGIN PROGRAM -- PAYROLL LOGIN PROGRAM -- PAYROLL LOGIN PROGRAM -- PAYROLL LOGIN PROGRAM
-                if (username.equals(payrollUsername) && inputPassword.equals(password)) {
-                    System.out.println("Payroll staff Login successful.");
+            if (option.equals("1")){
+                Scanner enterEmpNum = new Scanner(System.in);
+                System.out.print("Enter Employee #: ");
+                String empNum = enterEmpNum.nextLine();
+                enterEmpNum.close();
 
-                    String option; 
-                    String subOption;
+                String empNumber = "";
+                String empLastName = "";
+                String empFirstName = "";
+                String empBirthday = "";
+                boolean found = false;
+                                
 
-                    System.out.println("1.Process Payroll");
-                    System.out.println("2. Exit program");
+                try (BufferedReader br = new BufferedReader (new FileReader (empInfo))){
+                    br.readLine();
+                    String line;
 
-                    option = sc.nextLine();
+                    while ((line = br.readLine()) !=null){
+                        if(line.trim().isEmpty()) continue;
+                        String[] data = line.split(",");
 
-                        if (option.equals("1")) {
-                            System.out.println("1. View One Employee");
-                            System.out.println("2. View All Employees");
-                            System.out.println("3. Exit program");
-                            subOption = sc.nextLine();
-                            
-
-                                if (subOption.equals("1")){
-                                    oneEmployee(sc);;
-
-                                } else if (subOption.equals("2")){
-                                    allEmployee(sc);;
-
-                                } else if (subOption.equals("3")){
-                                    System.out.println("Exiting program.");
-                                    System.exit(0);
-                                }
-
-                        } else if (option.equals("2")) {
-                            System.out.println("Exiting program.");
-                            System.exit(0);
+                        if (data[0].equals(empNum)){
+                            empNumber = data[0];
+                            empLastName = data[1];
+                            empFirstName  = data[2];
+                            empBirthday = data[3];
+                            found = true;
+                            break;
                         }
-                    } else if (!username.equals(payrollUsername) && !inputPassword.equals(password)) {
-                    System.out.println("Incorrect credentials."); /*if the user enters the wrong username and password*/
+                    }
+
+                } catch (IOException e) {
+                    System.out.println("Employee file error.");
+
+                } if (found){
+                    System.out.println("\n=========================================================");
+                    System.out.println( "                   Employee Information");
+                    System.out.println("\n=========================================================");
+                    System.out.println("Employee #: " + empNumber);
+                    System.out.println("Employee Name: " + empLastName + ", " + empFirstName);
+                    System.out.println("Employee Birthday: " + empBirthday);
+                    System.out.println("\n=========================================================");
+                                                
+                    } else {
+                        System.out.println("\nEmployee does not exist.\n");
+                    }
+                       
+                } else if (option.equals("2")){
+                    System.out.println("\nExiting program.\n");
+                    System.exit(0);
                 }
-                sc.close();
-            } 
+                        
+                } else if (!username.equals(employeeUsername) && !inputPassword.equals(password)) {
+                    System.out.println("\nIncorrect credentials.\n");
+            }
+                    
+
+        //PAYROLL LOGIN PROGRAM -- PAYROLL LOGIN PROGRAM -- PAYROLL LOGIN PROGRAM -- PAYROLL LOGIN PROGRAM -- PAYROLL LOGIN PROGRAM -- PAYROLL LOGIN PROGRAM
+        if (username.equals(payrollUsername) && inputPassword.equals(password)) {
+
+            System.out.println("Payroll staff Login successful.");
+            String option; 
+            String subOption;
+
+            System.out.println("1.Process Payroll");
+            System.out.println("2. Exit program");
+            System.out.print("Choose Option: ");
+            option = sc.nextLine();
+
+            if (option.equals("1")) {
+
+                System.out.println("1. View One Employee");
+                System.out.println("2. View All Employees");
+                System.out.println("3. Exit program");
+                System.out.print("Choose Option: ");
+                subOption = sc.nextLine();
+                                
+
+                if (subOption.equals("1")){
+
+                    oneEmployee(sc);;
+
+                    } else if (subOption.equals("2")){
+
+                        allEmployee(sc);;
+
+                    } else if (subOption.equals("3")){
+
+                        System.out.println("\nExiting program.\n");
+                        System.exit(0);
+
+                    }
+
+            } else if (option.equals("2")) {
+
+                    System.out.println("\nExiting program.\n");
+                    System.exit(0);
+
+            }
+
+        } else if (!username.equals(payrollUsername) && !inputPassword.equals(password)) {
+
+            System.out.println("Incorrect credentials."); /*if the user enters the wrong username and password*/
+
+        }
+
+        sc.close();
+    } 
+
+
 
     /* =====================================================
-                        SSS computation (method 4) [rosella]
+        SSS Computation (Method # 1) [rosella]
     ===================================================== */
  
     public static double computeSSS(double monthlyGross) {
 
-                String file = "FINAL MO-IT101-Group24/src/sss.csv";
-                double lastEmployeeShare = 0;
+        String file = "FINAL MO-IT101-Group24/src/sss.csv";
+        double lastEmployeeShare = 0;
 
-                try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 
-                        br.readLine(); // skip header
-                        String line;
+            br.readLine(); // skip header
+            String line;
 
-                        while ((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null) {
 
-                                if (line.trim().isEmpty()) continue;
+                if (line.trim().isEmpty()) continue;
 
-                                String[] data = line.split(",");
+                String[] data = line.split(",");
+                double rangeFrom = Double.parseDouble(data[0].trim());
+                String rangeToText = data[1].trim();
+                double employeeShare = Double.parseDouble(data[3].trim());
 
-                                double rangeFrom = Double.parseDouble(data[0].trim());
-                                String rangeToText = data[1].trim();
-                                double employeeShare = Double.parseDouble(data[3].trim());
+                lastEmployeeShare = employeeShare;
 
-                                lastEmployeeShare = employeeShare;
+                if (rangeToText.equalsIgnoreCase("Over")) {
 
-                                if (rangeToText.equalsIgnoreCase("Over")) {
-                                        if (monthlyGross >= rangeFrom) {
-                                        return employeeShare;
-                                        }
-                                } else {
-                                        double rangeTo = Double.parseDouble(rangeToText);
+                    if (monthlyGross >= rangeFrom) {
 
-                                        if (monthlyGross >= rangeFrom && monthlyGross <= rangeTo) {
-                                        return employeeShare;
-                                        }
-                                }
-                        }
-                        br.close();
+                        return employeeShare;
 
-                } catch (Exception e) {
-                        e.printStackTrace();
+                    }
+
+                } else {
+
+                    double rangeTo = Double.parseDouble(rangeToText);
+
+                    if (monthlyGross >= rangeFrom && monthlyGross <= rangeTo) {
+
+                        return employeeShare;
+
+                    }
                 }
+            }
 
-                return lastEmployeeShare;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return lastEmployeeShare;
         
     }
 
     
 
     /* =====================================================
-                        Pag-ibig computation (method 5) [rosella]
+        Pag-ibig Computation (Method # 2) [rosella]
     ===================================================== */
 
     public static double computePagibig(double monthlyGross) {
 
-                String file = "FINAL MO-IT101-Group24/src/pagibig.csv";
-                double contribution = 0;
+        String file = "FINAL MO-IT101-Group24/src/pagibig.csv";
+        double contribution = 0;
 
-                try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 
-                        br.readLine(); // skip header
-                        String line;
+            br.readLine(); // skip header
+            String line;
 
-                        while ((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null) {
 
-                        if (line.trim().isEmpty()) continue;
+                if (line.trim().isEmpty()) continue;
 
-                        String[] data = line.split(",");
+                String[] data = line.split(",");
+                double rangeFrom = Double.parseDouble(data[0].trim());
+                double rangeTo = Double.parseDouble(data[1].trim());
+                double rate = Double.parseDouble(data[2].trim());
 
-                        double rangeFrom = Double.parseDouble(data[0].trim());
-                        double rangeTo = Double.parseDouble(data[1].trim());
-                        double rate = Double.parseDouble(data[2].trim());
+                if (monthlyGross >= rangeFrom && monthlyGross <= rangeTo) {
 
-                        if (monthlyGross >= rangeFrom && monthlyGross <= rangeTo) {
-                                contribution = monthlyGross * rate;
-                                break;
-                        }
-                        }
+                    contribution = monthlyGross * rate;
+                    break;
 
-                } catch (Exception e) {
-                                e.printStackTrace();
                 }
+            }
 
-                return Math.min(contribution, 100); 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return Math.min(contribution, 100); 
     }
 
- /* =====================================================
-        PhilHealth Computation (method) [ann]
+
+
+    /* =====================================================
+        PhilHealth Computation (Method # 3) [ann]
     ===================================================== */
+
     public static double computePhilhealth (double totalGross) {
         double PHdeduction = 0.0;
 
         if (totalGross <= 10000) {
             PHdeduction = 300/2;
-        } else if (totalGross > 10000 && totalGross < 60000){
-            PHdeduction =  totalGross*(0.03)/2;
-        } else if (totalGross >= 60000) {
-            PHdeduction = 1800/2;
-        }
+            } else if (totalGross > 10000 && totalGross < 60000){
+                PHdeduction =  totalGross*(0.03)/2;
+            } else if (totalGross >= 60000) {
+                PHdeduction = 1800/2;
+            }
 
         return PHdeduction;
-}
+    }
 
-/* =====================================================
-       Tax Computation (method) [ann]
+
+
+    /* ==================================================
+       Tax Computation (Method # 4) [ann]
     ===================================================== */
+
     public static double withholdingTax (double totalGross, double totalContribution) {
         double tax = 0.00;
         double taxableSalary = totalGross - totalContribution; /* retrieves the taxable salary by deducting all of the govt contributions to the gross*/
@@ -267,54 +298,71 @@ public class MotorPH {
             tax = 200833.33+(taxableSalary-666667)*0.35;
         }
         return tax;
-}   
-/* =====================================================
-       Hours Worked Computation (method)
+    }  
+    
+    
+
+    /* =====================================================
+        Hours Worked Computation (Method # 5) [ann]
     ===================================================== */
-public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
-            LocalTime gracePeriod = LocalTime.of(8, 10); // 8:00 AM - 8:10 AM
-            LocalTime cutoffTime = LocalTime.of(17, 0); // 5:00 PM
 
+    public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
+        
+        LocalTime gracePeriod = LocalTime.of(8, 10); // 8:00 AM - 8:10 AM
+        LocalTime cutoffTime = LocalTime.of(17, 0); // 5:00 PM
 
-            if (logOut.isAfter(cutoffTime)) {
-                logOut = cutoffTime; // limits logout time at 5:00 PM
-            }
+        if (logOut.isAfter(cutoffTime)) {
+            logOut = cutoffTime; // limits logout time at 5:00 PM
+        }
 
             long  minutesWorked = Duration.between(logIn, logOut).toMinutes(); //calculates the duration between log in and log out time.
             int lunchBreak = 60; // 1 hour lunch break
-            if (minutesWorked > lunchBreak) {
-                minutesWorked -= lunchBreak; // deducts 1 hour for lunch break if total minutes worked is more than 1 hour.
+
+        if (minutesWorked > lunchBreak) {
+
+            minutesWorked -= lunchBreak; // deducts 1 hour for lunch break if total minutes worked is more than 1 hour.
+
             } else {
+
                 minutesWorked = 0; // if total minutes worked is less than or equal to 1 hour, then no hours are counted.
+
             }
 
             double hoursWorked = minutesWorked;
 
             if (!logIn.isAfter(gracePeriod)) {
+
                 return 8.0; // if log in time is before or at 8:10 AM, counts as 8 hours worked.
+
             }
+
             return hoursWorked / 60.0; // converts minutes worked to hours.
             
-        }
+    }
 
 
-        static double computeGross(double hours, double rate) {
-            return hours * rate;
-        }
+    /* =====================================================
+        Gross Computation (Method # 6) [ann]
+    ===================================================== */
 
-      
-            //       sss DETAILS [rosella]
+    static double computeGross(double hours, double rate) {
+
+        return hours * rate;
+
+    }
+
+              
+        
+    /* =====================================================
+       For One Employee (Method # 7) [rosella]
+    ===================================================== */
 
     public static void oneEmployee (Scanner sc) {
 
         String empFile = "FINAL MO-IT101-Group24/src/details.csv";
         String attFile = "FINAL MO-IT101-Group24/src/attendance.csv";
-
-    
-
         System.out.print("Enter Employee #: ");
         String inputEmpNo = sc.nextLine();
-
         String empNo = "";
         String firstName = "";
         String lastName = "";
@@ -323,6 +371,7 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
         double rate = 0;
 
     
+
         try (BufferedReader br = new BufferedReader(new FileReader(empFile))) {
 
             br.readLine();
@@ -344,25 +393,26 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
                 }
             }
 
-        } catch (Exception e) {
-            System.out.println("Error reading employee file.");
-            
+        } catch (IOException e) {
+            System.out.println("Error reading employee file.");  
         }
 
         if (!found) {
-            System.out.println("Employee does not exist.");
-            
+            System.out.println("Employee does not exist.");   
         }
+
+
 
         System.out.println("\n===================================");
         System.out.println("Employee # : " + empNo);
         System.out.println("Employee Name : " + lastName + ", " + firstName);
         System.out.println("Birthday : " + birthday);
         System.out.println("===================================");
-
         DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
 
-       
+
+
+        // Loop through each employee's computations from June to December
         for (int month = 6; month <= 12; month++) { 
             double firstHalf = 0;
             double secondHalf = 0;
@@ -396,33 +446,28 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
                     else secondHalf += hours;
                 }
 
-            } catch (Exception e) {
+            } catch (IOException e) {
                 System.out.println("Error reading attendance file for month " + month);
                 e.printStackTrace();
                 continue;
             }
 
-            
-            
-            double grossFirst = computeGross(firstHalf, rate);
 
-            
+
+            // Gross Computations
+            double grossFirst = computeGross(firstHalf, rate); 
             double grossSecond = computeGross(secondHalf, rate);
-
             double monthlyGross = grossFirst + grossSecond; 
 
-            
+            // Deductions Computations
             double sss = computeSSS(monthlyGross);
             double pagibig = computePagibig(monthlyGross);
             double philhealth = computePhilhealth(monthlyGross);
-
             double totalContribution = sss + philhealth + pagibig;
-
             double tax = withholdingTax(monthlyGross, totalContribution); 
-
             double totalDeductions = sss + pagibig + philhealth + tax;
 
-            
+            // Net Salary for the second cutoff with deductions
             double netSalary = grossSecond - totalDeductions;
 
             String monthName = switch (month) {
@@ -450,19 +495,27 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
             System.out.println("    Tax: " + tax);
             System.out.println("Total Deductions: " + totalDeductions);
             System.out.println("Net Salary: " + netSalary);
-        }
+        }  
 
-        
+        System.out.println("\n===================================");
+        System.out.println("          END OF RECORD");
+        System.out.println("=====================================");
     }
+
+
+
+    /* =====================================================
+       For All Employee (Method # 8) [rosella]
+    ===================================================== */
 
     public static void allEmployee(Scanner sc) {
 
         String empFile = "FINAL MO-IT101-Group24/src/details.csv";
         String attFile = "FINAL MO-IT101-Group24/src/attendance.csv";
         DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
-
-        
         List<String[]> employees = new ArrayList<>();
+
+
 
         try (BufferedReader br = new BufferedReader(new FileReader(empFile))) {
             br.readLine(); // Skip header
@@ -473,11 +526,13 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
                 String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
                 employees.add(data); // store each employee row
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println("Error reading employee file.");
         }
 
-        // Loop through each employee (repeats 34 times)
+
+
+        // Loop through each employee's  result (34 times employees)
         for (String[] empData : employees) {
 
             String empNo     = empData[0];
@@ -492,7 +547,7 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
             System.out.println("Birthday : " + birthday);
             System.out.println("===================================");
 
-            // Attendance loop per employee
+            // Loop each employee's computations from June to December
             for (int month = 6; month <= 12; month++) {
                 double firstHalf = 0;
                 double secondHalf = 0;
@@ -523,33 +578,30 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
                         else           secondHalf += hours;
                     }
 
-                } catch (Exception e) {
+                } catch (IOException e) {
                     System.out.println("Error reading attendance for month " + month);
                     continue;
                 }
 
+
+
                 String monthName = Month.of(month).toString();
 
                 
-                double grossFirst = computeGross(firstHalf, rate);
-
-                
+                // Gross Computations
+                double grossFirst = computeGross(firstHalf, rate); 
                 double grossSecond = computeGross(secondHalf, rate);
-
                 double monthlyGross = grossFirst + grossSecond; 
 
-                
+                // Deductions Computations
                 double sss = computeSSS(monthlyGross);
                 double pagibig = computePagibig(monthlyGross);
                 double philhealth = computePhilhealth(monthlyGross);
-
                 double totalContribution = sss + philhealth + pagibig;
-
-                double tax = withholdingTax(monthlyGross, totalContribution);
-
+                double tax = withholdingTax(monthlyGross, totalContribution); 
                 double totalDeductions = sss + pagibig + philhealth + tax;
 
-                
+                // Net Salary for the second cutoff with deductions
                 double netSalary = grossSecond - totalDeductions;
 
                 System.out.println("\nCutoff Date: " + monthName + " 1 to 15");
@@ -572,7 +624,7 @@ public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
 
             System.out.println("\n===================================");
             System.out.println("          END OF RECORD");
-            System.out.println("===================================");
+            System.out.println("=====================================");
         }
     }
 }
