@@ -144,7 +144,7 @@ public class MotorPH {
             } 
 
             /* =====================================================
-                        SSS computation (method 4)
+                        SSS computation (method 4) [rosella]
     ===================================================== */
  
     public static double computeSSS(double monthlyGross) {
@@ -191,36 +191,10 @@ public class MotorPH {
         
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     
 
     /* =====================================================
-                        Pag-ibig computation (method 5)
+                        Pag-ibig computation (method 5) [rosella]
     ===================================================== */
 
     public static double computePagibig(double monthlyGross) {
@@ -255,9 +229,50 @@ public class MotorPH {
 
                 return Math.min(contribution, 100); 
     }
-            
-     
-            
+
+ /* =====================================================
+        PhilHealth Computation (method) [ann]
+    ===================================================== */
+    public static double computePH (double totalGross) {
+        double PHdeduction = 0.0;
+
+        if (totalGross <= 10000) {
+            PHdeduction = 300/2;
+        } else if (totalGross > 10000 && totalGross < 60000){
+            PHdeduction =  totalGross*(0.03)/2;
+        } else if (totalGross >= 60000) {
+            PHdeduction = 1800/2;
+        }
+
+        return PHdeduction;
+}
+
+/* =====================================================
+       Tax Computation (method) [ann]
+    ===================================================== */
+    public static double computeTax (double totalGross, double totalContribution) {
+        double tax = 0.00;
+        double taxableSalary = totalGross - totalContribution;
+
+        if (totalGross <= 20832) {
+            tax = 0.00;
+        } else if (totalGross >= 20833 && totalGross < 33333) {
+            tax = (taxableSalary-20833)*0.2;
+
+        } else if (totalGross >= 33333 && totalGross < 66667) {
+            tax = 2500+(taxableSalary-33333)*0.25;
+
+        } else if (totalGross >= 66667 && totalGross < 166667) {
+            tax = 10833+(taxableSalary-66667)*0.30;
+
+        } else if (totalGross >= 166667 && totalGross < 666667) {
+            tax = 40833.33+(taxableSalary-166667)*0.32;
+
+        } else if (totalGross >= 666667) {
+            tax = 200833.33+(taxableSalary-666667)*0.35;
+        }
+        return tax;
+}   
 
 
 
@@ -266,7 +281,11 @@ public class MotorPH {
 
 
 
-            //       sss DETAILS
+
+
+
+      
+            //       sss DETAILS [rosella]
 
     public static void oneEmployee (Scanner sc) {
 
