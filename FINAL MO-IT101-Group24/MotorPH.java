@@ -52,7 +52,7 @@ public class MotorPH {
 
             String option = "";
                 
-            System.out.println("1. Enter your Employee Number");
+            System.out.println("1. View Employee Details ");
             System.out.println("2. Exit program");
             System.out.print("Choose Option: ");
             option = sc.nextLine();
@@ -643,7 +643,7 @@ public class MotorPH {
             System.out.println("Error reading employee file.");
         }
 
-        // List to store all attendance records loaded from the attendance file
+        // Load all attendance records into memory once before the loop to avoid repeatedly opening the file for each employee and each month.
         List<String[]> attendanceRecords = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(attFile))) {
             br.readLine();
