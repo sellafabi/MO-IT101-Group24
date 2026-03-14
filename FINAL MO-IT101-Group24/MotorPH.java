@@ -35,7 +35,7 @@ public class MotorPH {
         
 
 
-        //EMPLOYEE LOGIN PROGRAM -- EMPLOYEE LOGIN PROGRAM -- EMPLOYEE LOGIN PROGRAM -- EMPLOYEE LOGIN PROGRAM -- EMPLOYEE LOGIN PROGRAM -- EMPLOYEE LOGIN PROGRAM
+        //EMPLOYEE LOGIN PROGRAM -- this section contains the employee login program and its corresponding menus and conditions.
         if (username.equals(employeeUsername) && inputPassword.equals(password)) {
             System.out.println("Employee login successful.\n");
 
@@ -47,12 +47,12 @@ public class MotorPH {
             option = sc.nextLine();
 
             if (option.equals("1")){
-                Scanner enterEmpNum = new Scanner(System.in);
+                /*Scanner enterEmpNum = new Scanner(System.in); - commented this out to because ire-reuse natin ang "sc" for scanner reusability. pakibura once read and revised:)*/
                 System.out.print("Enter Employee #: ");
-                String empNum = enterEmpNum.nextLine();
-                enterEmpNum.close();
+                String empNum = sc.nextLine(); /*changed enterEmpNum.nextLine() to sc.nextLine() for reusability of scanner */
+                /*enterEmpNum.close(); - commented out for unit testing to see if the code will still run without this.pakibura once read and revised:)*/
 
-                String empNumber = "";
+                String empNumber = ""; /*I retained this varible name, ito na ang variable for everything that contains the employee number. pakibura once read and revised:)*/
                 String empLastName = "";
                 String empFirstName = "";
                 String empBirthday = "";
@@ -98,13 +98,10 @@ public class MotorPH {
                     System.exit(0);
                 }
                         
-                } else if (!username.equals(employeeUsername) && !inputPassword.equals(password)) {
-                    System.out.println("\nIncorrect credentials.\n");
             }
                     
-
-        //PAYROLL LOGIN PROGRAM -- PAYROLL LOGIN PROGRAM -- PAYROLL LOGIN PROGRAM -- PAYROLL LOGIN PROGRAM -- PAYROLL LOGIN PROGRAM -- PAYROLL LOGIN PROGRAM
-        if (username.equals(payrollUsername) && inputPassword.equals(password)) {
+        //PAYROLL LOGIN PROGRAM -- this section contains the payroll staff login program and its corresponding menus and conditions to call different methods for the payroll computation.
+        else if (username.equals(payrollUsername) && inputPassword.equals(password)) { /*connects the payroll login to the emp login using "else if" so they'd both work on the catch condition at the end of this login program */
 
             System.out.println("Payroll staff Login successful.");
             String option; 
@@ -120,7 +117,7 @@ public class MotorPH {
                 System.out.println("1. View One Employee");
                 System.out.println("2. View All Employees");
                 System.out.println("3. Exit program");
-                System.out.print("Choose Option: ");
+                System.out.print("Choose Sub-option: ");
                 subOption = sc.nextLine();
                                 
 
@@ -146,11 +143,12 @@ public class MotorPH {
 
             }
 
-        } else if (!username.equals(payrollUsername) && !inputPassword.equals(password)) {
+        } else { /*changed the "else if" condition with "else" since it's connected on both the payroll and employee user.  */
 
-            System.out.println("Incorrect credentials."); /*if the user enters the wrong username and password*/
+            System.out.println("Incorrect credentials.");
+            System.exit(0);
 
-        }
+        } /* if the user enters either (or both) username and password incorrectly, the system shall print "Incorrect credentials." and will immediately terminate ng system. */
 
         sc.close();
     } 
@@ -255,19 +253,19 @@ public class MotorPH {
     /* =====================================================
         PhilHealth Computation (Method # 3) [ann]
     ===================================================== */
-
+// Using the given data by MotorPH, this method calculates the employee's share for the PhilHealth calculation considering their total gross income for the month.
     public static double computePhilhealth (double totalGross) {
         double PHdeduction = 0.0;
 
         if (totalGross <= 10000) {
-            PHdeduction = 300/2;
+            PHdeduction = 300/2; /*the employee only pays half of the deduction and shares the half to their employer, hence the ( /2) line */
             } else if (totalGross > 10000 && totalGross < 60000){
                 PHdeduction =  totalGross*(0.03)/2;
             } else if (totalGross >= 60000) {
                 PHdeduction = 1800/2;
             }
 
-        return PHdeduction;
+        return PHdeduction; /*this ends the method and sends the value back to the PHdeduction. */
     }
 
 
@@ -278,24 +276,24 @@ public class MotorPH {
 
     public static double withholdingTax (double totalGross, double totalContribution) {
         double tax = 0.00;
-        double taxableSalary = totalGross - totalContribution; /* retrieves the taxable salary by deducting all of the govt contributions to the gross*/
+        double taxableMonthlySalary = totalGross - totalContribution; /* retrieves the taxable salary by deducting all of the government contributions to the gross. the taxable salary is then used */
         
-        if (totalGross <= 20832) {
+        if (taxableMonthlySalary <= 20832) {
             tax = 0.00;
-        } else if (totalGross >= 20833 && totalGross < 33333) {
-            tax = (taxableSalary-20833)*0.2;
+        } else if (taxableMonthlySalary >= 20833 && taxableMonthlySalary < 33333) {
+            tax = (taxableMonthlySalary-20833)*0.2;
 
         } else if (totalGross >= 33333 && totalGross < 66667) {
-            tax = 2500+(taxableSalary-33333)*0.25;
+            tax = 2500+(taxableMonthlySalary-33333)*0.25;
 
         } else if (totalGross >= 66667 && totalGross < 166667) {
-            tax = 10833+(taxableSalary-66667)*0.30;
+            tax = 10833+(taxableMonthlySalary-66667)*0.30;
 
         } else if (totalGross >= 166667 && totalGross < 666667) {
-            tax = 40833.33+(taxableSalary-166667)*0.32;
+            tax = 40833.33+(taxableMonthlySalary-166667)*0.32;
 
         } else if (totalGross >= 666667) {
-            tax = 200833.33+(taxableSalary-666667)*0.35;
+            tax = 200833.33+(taxableMonthlySalary-666667)*0.35;
         }
         return tax;
     }  
@@ -344,6 +342,7 @@ public class MotorPH {
     /* =====================================================
         Gross Computation (Method # 6) [ann]
     ===================================================== */
+//This method computes the gross salary of the employee by multiplying the hours worked to the employee's hourly rate.
 
     static double computeGross(double hours, double rate) {
 
