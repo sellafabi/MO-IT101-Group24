@@ -105,12 +105,16 @@ public class MotorPH {
                     System.out.println("\n=========================================================");
                                                 
                     } else {
-                        System.out.println("\nEmployee does not exist.\n");
+                        System.out.println("\nEmployee number does not exist.\n");
                     }
                        
                 } else if (option.equals("2")){
                     System.out.println("\nExiting program.\n");
                     System.exit(0);
+                
+                } else {
+                // If the user enters anything other than 1 or 2, notify them it is invalid
+                System.out.println("\nInvalid option. Please enter 1 or 2.\n");
                 }
                         
             }
@@ -150,6 +154,9 @@ public class MotorPH {
                         System.out.println("\nExiting program.\n");
                         System.exit(0);
 
+                    } else {
+                        // If the user enters anything other than 1, 2, or 3, notify them it is invalid
+                        System.out.println("\nInvalid option. Please enter 1, 2, or 3.\n");
                     }
 
             } else if (option.equals("2")) {
@@ -157,12 +164,15 @@ public class MotorPH {
                     System.out.println("\nExiting program.\n");
                     System.exit(0);
 
+            } else {
+                // If the user enters anything other than 1 or 2, notify them it is invalid
+                System.out.println("\nInvalid option. Please enter 1 or 2.\n");
             }
 
         // If either username or password is incorrect, deny access and terminate the program
         } else { 
 
-            System.out.println("Incorrect credentials.");
+            System.out.println("Incorrect username and/or password. ");
             System.exit(0);
 
         } 
@@ -374,8 +384,8 @@ public class MotorPH {
         /**
         * Computes the total hours worked by an employee for a single day.
         * Applies three rules:
-        * 1. If the employee logs in at or before 8:10 AM (grace period), they are
-        *    credited with a full 8 hours regardless of exact login time.
+        * 1. If the employee logs in at or before 8:10 AM (grace period), login
+        *    time is treated as 8:00 AM for computation purposes.
         * 2. Logout time is capped at 5:00 PM — overtime is not counted.
         * 3. A mandatory 1-hour lunch break is deducted from the total duration.
         * @param logIn  the time the employee logged in
@@ -388,10 +398,16 @@ public class MotorPH {
         
         LocalTime gracePeriod = LocalTime.of(8, 10); // grace period ends at 8:10 AM
         LocalTime cutoffTime = LocalTime.of(17, 0); // workday ends at 5:00 PM
+        LocalTime standardStart = LocalTime.of(8, 0); // standard start time 8:00 AM
 
         // Overtime is not counted — cap logout time at 5:00 PM
         if (logOut.isAfter(cutoffTime)) {
             logOut = cutoffTime; // limits logout time at 5:00 PM
+        }
+
+        // If employee logged in within the grace period, treat login as 8:00 AM
+        if (!logIn.isAfter(gracePeriod)) {
+            logIn = standardStart; // use 8:00 AM as effective login time
         }
 
         // Calculate total minutes between login and logout
@@ -408,16 +424,7 @@ public class MotorPH {
 
             }
 
-            double hoursWorked = minutesWorked;
-
-            // If employee logged in within the grace period, credit a full 8-hour workday
-            if (!logIn.isAfter(gracePeriod)) {
-
-                return 8.0;
-
-            }
-
-            return hoursWorked / 60.0; // Convert remaining minutes to hours and return
+        return minutesWorked / 60.0; // Convert remaining minutes to hours and return
             
     }
 
@@ -500,7 +507,7 @@ public class MotorPH {
 
         // Stop execution if no matching employee record was found
         if (!found) {
-            System.out.println("Employee does not exist.");
+            System.out.println("Employee number does not exist.");
             return;
         }
 
