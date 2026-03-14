@@ -49,13 +49,13 @@ public class MotorPH {
             if (option.equals("1")){
                 /*Scanner enterEmpNum = new Scanner(System.in); - commented this out to because ire-reuse natin ang "sc" for scanner reusability. pakibura once read and revised:)*/
                 System.out.print("Enter Employee #: ");
-                String empNum = sc.nextLine(); /*changed enterEmpNum.nextLine() to sc.nextLine() for reusability of scanner */
+                String enterEmpNum = sc.nextLine(); /*changed enterEmpNum.nextLine() to sc.nextLine() for reusability of scanner */
                 /*enterEmpNum.close(); - commented out for unit testing to see if the code will still run without this.pakibura once read and revised:)*/
 
-                String empNumber = ""; /*I retained this varible name, ito na ang variable for everything that contains the employee number. pakibura once read and revised:)*/
-                String empLastName = "";
-                String empFirstName = "";
-                String empBirthday = "";
+                String employeeNumber = ""; 
+                String employeeLastName = "";
+                String employeeFirstName = "";
+                String employeeBirthday = "";
                 boolean found = false;
                                 
 
@@ -67,11 +67,11 @@ public class MotorPH {
                         if(line.trim().isEmpty()) continue;
                         String[] data = line.split(",");
 
-                        if (data[0].equals(empNum)){
-                            empNumber = data[0];
-                            empLastName = data[1];
-                            empFirstName  = data[2];
-                            empBirthday = data[3];
+                        if (data[0].equals(enterEmpNum)){
+                            employeeNumber = data[0];
+                            employeeLastName = data[1];
+                            employeeFirstName  = data[2];
+                            employeeBirthday = data[3];
                             found = true;
                             break;
                         }
@@ -84,9 +84,9 @@ public class MotorPH {
                     System.out.println("\n=========================================================");
                     System.out.println( "                   Employee Information");
                     System.out.println("\n=========================================================");
-                    System.out.println("Employee #: " + empNumber);
-                    System.out.println("Employee Name: " + empLastName + ", " + empFirstName);
-                    System.out.println("Employee Birthday: " + empBirthday);
+                    System.out.println("Employee #: " + employeeNumber);
+                    System.out.println("Employee Name: " + employeeLastName + ", " + employeeFirstName);
+                    System.out.println("Employee Birthday: " + employeeBirthday);
                     System.out.println("\n=========================================================");
                                                 
                     } else {
@@ -101,7 +101,7 @@ public class MotorPH {
             }
                     
         //PAYROLL LOGIN PROGRAM -- this section contains the payroll staff login program and its corresponding menus and conditions to call different methods for the payroll computation.
-        else if (username.equals(payrollUsername) && inputPassword.equals(password)) { /*connects the payroll login to the emp login using "else if" so they'd both work on the catch condition at the end of this login program */
+        else if (username.equals(payrollUsername) && inputPassword.equals(password)) { /*connects the payroll login to the employee login using "else if" so they'd both work on the catch condition at the end of this login program */
 
             System.out.println("Payroll staff Login successful.");
             String option; 
@@ -276,23 +276,23 @@ public class MotorPH {
 
     public static double withholdingTax (double totalGross, double totalContribution) {
         double tax = 0.00;
-        double taxableMonthlySalary = totalGross - totalContribution; /* retrieves the taxable salary by deducting all of the government contributions to the gross. the taxable salary is then used */
+        double taxableMonthlySalary = totalGross - totalContribution; /* retrieves the taxable salary by deducting all of the government contributions to the gross. the taxable salary is then used to compute the withholding tax */
         
         if (taxableMonthlySalary <= 20832) {
             tax = 0.00;
         } else if (taxableMonthlySalary >= 20833 && taxableMonthlySalary < 33333) {
             tax = (taxableMonthlySalary-20833)*0.2;
 
-        } else if (totalGross >= 33333 && totalGross < 66667) {
+        } else if (taxableMonthlySalary >= 33333 && taxableMonthlySalary < 66667) {
             tax = 2500+(taxableMonthlySalary-33333)*0.25;
 
-        } else if (totalGross >= 66667 && totalGross < 166667) {
+        } else if (taxableMonthlySalary >= 66667 && taxableMonthlySalary < 166667) {
             tax = 10833+(taxableMonthlySalary-66667)*0.30;
 
-        } else if (totalGross >= 166667 && totalGross < 666667) {
+        } else if (taxableMonthlySalary >= 166667 && taxableMonthlySalary < 666667) {
             tax = 40833.33+(taxableMonthlySalary-166667)*0.32;
 
-        } else if (totalGross >= 666667) {
+        } else if (taxableMonthlySalary >= 666667) {
             tax = 200833.33+(taxableMonthlySalary-666667)*0.35;
         }
         return tax;
