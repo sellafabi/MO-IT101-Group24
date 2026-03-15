@@ -37,7 +37,7 @@ public class MotorPH {
         String employeeUsername = "employee";
         String password = "12345";
 
-        System.out.print("Enter Username: ");
+        System.out.print("\nEnter Username: ");
         String username = sc.nextLine();
 
         System.out.print("Enter Password: ");
@@ -126,7 +126,7 @@ public class MotorPH {
             String option; 
             String subOption;
 
-            System.out.println("1.Process Payroll");
+            System.out.println("1. Process Payroll");
             System.out.println("2. Exit program");
             System.out.print("Choose Option: ");
             
@@ -343,8 +343,8 @@ public class MotorPH {
         * contributions (SSS, PhilHealth, Pag-IBIG) from the gross salary. The resulting
         * taxable salary is then matched against the six BIR tax brackets to compute
         * the correct withholding tax amount.
-        * @param totalGross         the total gross salary of the employee for the month
-        * @param totalContribution  the total of SSS, PhilHealth, and Pag-IBIG contributions
+        * @param totalGross the total gross salary of the employee for the month
+        * @param totalContribution the total of SSS, PhilHealth, and Pag-IBIG contributions
         * @return the computed withholding tax amount
         */
 
@@ -390,7 +390,7 @@ public class MotorPH {
         *    time is treated as 8:00 AM for computation purposes.
         * 2. Logout time is capped at 5:00 PM — overtime is not counted.
         * 3. A mandatory 1-hour lunch break is deducted from the total duration.
-        * @param logIn  the time the employee logged in
+        * @param logIn the time the employee logged in
         * @param logOut the time the employee logged out
         * @return the total hours worked as a decimal (example: 7.5 for 7 hours 30 minutes)
         */
@@ -440,7 +440,7 @@ public class MotorPH {
         * Computes the gross salary for a given period by multiplying the total
         * hours worked by the employee's hourly rate.
         * @param hours the total number of hours worked in the cutoff period
-        * @param rate  the employee's hourly rate
+        * @param rate the employee's hourly rate
         * @return the gross salary for the cutoff period
         */
 
@@ -492,13 +492,13 @@ public class MotorPH {
                     continue;
                 String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
-                // If a match is found, store employee details and stop searching
+                // If a match is found, store employee details from CSV and stop searching
                 if (data[0].equals(employeeNumber)) {
                     employeeNo = data[0];
                     lastName = data[1];
                     firstName = data[2];
                     birthday = data[3];
-                    rate = Double.parseDouble(data[18].trim()); // hourly rate is at column 18
+                    rate = Double.parseDouble(data[18].trim()); // hourly rate is at column 18 from CSV
                     found = true;
                     break;
                 }
