@@ -58,7 +58,7 @@ public class MotorPH {
             option = sc.nextLine();
 
             if (option.equals("1")){
-                
+                System.out.println("\n");
                 System.out.print("Enter Employee #: ");
 
                 // Reusing the existing sc Scanner instance instead of creating a new one
@@ -122,17 +122,18 @@ public class MotorPH {
         // PAYROLL LOGIN — grants access to payroll processing for one or all employees
         else if (username.equals(payrollUsername) && inputPassword.equals(password)) { 
 
-            System.out.println("Payroll staff Login successful.");
+            System.out.println("Payroll staff Login successful.\n");
             String option; 
             String subOption;
 
             System.out.println("1.Process Payroll");
             System.out.println("2. Exit program");
             System.out.print("Choose Option: ");
+            
             option = sc.nextLine();
 
             if (option.equals("1")) {
-
+                System.out.println("\n");
                 System.out.println("1. View One Employee");
                 System.out.println("2. View All Employees");
                 System.out.println("3. Exit program");
@@ -141,6 +142,7 @@ public class MotorPH {
                                 
                 // Route to the appropriate payroll method based on the sub-option selected
                 if (subOption.equals("1")){
+                System.out.println("\n");
                 System.out.print("Enter Employee #: ");
                 String inputEmployeeNumber = sc.nextLine();
                 oneEmployee(inputEmployeeNumber);  
