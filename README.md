@@ -24,4 +24,4 @@ The MotorPH Payroll System is a Java console application that automates payroll 
 
 ##  Project Plan
 
-[View Project Plan](https://docs.google.com/spreadsheets/d/1ljWASEr50y_1dwmd23QVNYlpLcknu3_EU1c3OyJKV-A/edit?usp=sharing)
+[View Project Plan](https://docs.google.com/spreadsheets/d/1nOglg-Bu7eLWkUNbUG-aD5LpB2aPPZ5IaRWzEvQpfC4/edit?gid=2134013708#gid=2134013708)
