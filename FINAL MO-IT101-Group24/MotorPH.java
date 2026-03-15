@@ -37,6 +37,9 @@ public class MotorPH {
         String employeeUsername = "employee";
         String password = "12345";
 
+        System.out.println("\n==================================== ");
+        System.out.println("        MotorPH Login System         ");
+        System.out.println("==================================== ");
         System.out.print("\nEnter Username: ");
         String username = sc.nextLine();
 
@@ -48,18 +51,19 @@ public class MotorPH {
 
         // EMPLOYEE LOGIN — grants access to employee self-service information lookup
         if (username.equals(employeeUsername) && inputPassword.equals(password)) {
-            System.out.println("Employee login successful.\n");
-
+            System.out.println("\nEmployee login successful.");
             String option = "";
-                
-            System.out.println("1. View Employee Details ");
+
+            System.out.println("\n==================================== ");
+            System.out.println("\n1. View Employee Details ");
             System.out.println("2. Exit program");
-            System.out.print("Choose Option: ");
+            System.out.print("Choose Option: \n");
             option = sc.nextLine();
+            System.out.println("==================================== \n");
 
             if (option.equals("1")){
-                System.out.println("\n");
-                System.out.print("Enter Employee #: ");
+                // System.out.println("\n");
+                System.out.print("Enter Your Employee Number: ");
 
                 // Reusing the existing sc Scanner instance instead of creating a new one
                 String inputEmployeeNumber = sc.nextLine(); 
@@ -91,18 +95,18 @@ public class MotorPH {
                     }
 
                 } catch (IOException e) {
-                    System.out.println("Employee file error.");
+                    System.out.println("\nEmployee file error.\n");
 
                 
                 // Display employee information if found, otherwise notify the user
                 } if (found){
-                    System.out.println("\n=========================================================");
-                    System.out.println( "                   Employee Information");
-                    System.out.println("\n=========================================================");
-                    System.out.println("Employee #: " + employeeNo);
+                    System.out.println("\n==================================== ");
+                    System.out.println( "        Employee Information");
+                    System.out.println("==================================== ");
+                    System.out.println("\nEmployee #: " + employeeNo);
                     System.out.println("Employee Name: " + employeeLastName + ", " + employeeFirstName);
                     System.out.println("Employee Birthday: " + employeeBirthday);
-                    System.out.println("\n=========================================================");
+                    System.out.println("====================================\n");
                                                 
                     } else {
                         System.out.println("\nEmployee number does not exist.\n");
@@ -110,11 +114,12 @@ public class MotorPH {
                        
                 } else if (option.equals("2")){
                     System.out.println("\nExiting program.\n");
-                    System.exit(0);
+                    System.exit(0); // program terminated
                 
                 } else {
                 // If the user enters anything other than 1 or 2, notify them it is invalid
                 System.out.println("\nInvalid option. Please enter 1 or 2.\n");
+                System.exit(0); // program terminated
                 }
                         
             }
@@ -122,28 +127,30 @@ public class MotorPH {
         // PAYROLL LOGIN — grants access to payroll processing for one or all employees
         else if (username.equals(payrollUsername) && inputPassword.equals(password)) { 
 
-            System.out.println("Payroll staff Login successful.\n");
+            System.out.println("\nPayroll staff Login successful!");
             String option; 
             String subOption;
 
-            System.out.println("1. Process Payroll");
+            System.out.println("\n==================================== ");
+            System.out.println("\n1. Process Payroll");
             System.out.println("2. Exit program");
             System.out.print("Choose Option: ");
-            
             option = sc.nextLine();
+            System.out.println("\n====================================");
+            
+            
 
             if (option.equals("1")) {
-                System.out.println("\n");
-                System.out.println("1. View One Employee");
+                System.out.println("\n1. View One Employee");
                 System.out.println("2. View All Employees");
                 System.out.println("3. Exit program");
                 System.out.print("Choose Sub-option: ");
                 subOption = sc.nextLine();
+                System.out.println("\n====================================\n");
                                 
                 // Route to the appropriate payroll method based on the sub-option selected
                 if (subOption.equals("1")){
-                System.out.println("\n");
-                System.out.print("Enter Employee #: ");
+                System.out.print("Enter Employee Number: ");
                 String inputEmployeeNumber = sc.nextLine();
                 oneEmployee(inputEmployeeNumber);  
 
@@ -174,7 +181,7 @@ public class MotorPH {
         // If either username or password is incorrect, deny access and terminate the program
         } else { 
 
-            System.out.println("Incorrect username and/or password. ");
+            System.out.println("\nIncorrect username and/or password.\n");
             System.exit(0);
 
         } 
@@ -514,7 +521,9 @@ public class MotorPH {
         }
 
         // Display the matched employee's basic information
-        System.out.println("\n===================================");
+        System.out.println("\n==================================== ");
+        System.out.println("        Employee's Payroll         ");
+        System.out.println("==================================== ");
         System.out.println("Employee # : " + employeeNo);
         System.out.println("Employee Name : " + lastName + ", " + firstName);
         System.out.println("Birthday : " + birthday);
@@ -674,7 +683,9 @@ public class MotorPH {
             double rate = Double.parseDouble(employeeData[18].trim()); // hourly rate is at column 18
 
             // Display the employee's basic information
-            System.out.println("\n===================================");
+            System.out.println("\n==================================== ");
+            System.out.println("        All Employee's Payroll         ");
+            System.out.println("==================================== ");
             System.out.println("Employee # : " + employeeNo);
             System.out.println("Employee Name : " + lastName + ", " + firstName);
             System.out.println("Birthday : " + birthday);
