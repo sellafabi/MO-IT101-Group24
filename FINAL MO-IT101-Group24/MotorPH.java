@@ -624,32 +624,37 @@ public class MotorPH {
 
     public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
         
-        LocalTime gracePeriod = LocalTime.of(8, 10); // grace period ends at 8:10 AM (inclusive)
-        LocalTime cutoffTime = LocalTime.of(17, 0); // official end of workday: 5:00 PM
-        LocalTime standardStart = LocalTime.of(8, 0); // standard start of workday: 8:00 AM
+        final LocalTime GRACE_PERIOD = LocalTime.of(8, 10); // grace period ends at 8:10 AM (inclusive)
+        final LocalTime STANDARD_START = LocalTime.of(8, 0); // standard start of workday: 8:00 AM
+        final LocalTime CUTOFF_TIME = LocalTime.of(17, 0); // official end of workday: 5:00 PM
+        final int LUNCH_BREAK = 60;
+
+        // Prevent invalid attendance records
+        if (logOut.isBefore(logIn)) {
+            return 0;
+        }
 
         // Rule 1: If the employee logged out after 5:00 PM, cap the logout at 5:00 PM.
         // This ensures overtime is not counted in the hours worked calculation.
-        if (logOut.isAfter(cutoffTime)) {
-            logOut = cutoffTime;
+        if (logOut.isAfter(CUTOFF_TIME)) {
+            logOut = CUTOFF_TIME;
         }
 
         // Rule 2: If the employee logged in at or before the grace period (8:10 AM),
         // treat the login as the standard start time (8:00 AM). This covers both
         // exact 8:00 AM logins and early arrivals up to 8:10 AM.
-        if (!logIn.isAfter(gracePeriod)) {
-            logIn = standardStart;
+        if (!logIn.isAfter(GRACE_PERIOD)) {
+            logIn = STANDARD_START;
         }
 
-        // Calculate the raw duration between the (adjusted) login and logout times
+        // This line calculates the total number of minutes worked by the employee between the login and logout times.
         long  minutesWorked = Duration.between(logIn, logOut).toMinutes();
 
         // Rule 3: Deduct the mandatory 60-minute lunch break.
         // The deduction only applies if the employee was present for more than an hour.
         // If 60 minutes or less were logged, no productive work time is counted.
-        int lunchBreak = 60;
-        if (minutesWorked > lunchBreak) {
-            minutesWorked -= lunchBreak;
+        if (minutesWorked > LUNCH_BREAK) {
+            minutesWorked -= LUNCH_BREAK;
         } else {
             minutesWorked = 0;
         }
