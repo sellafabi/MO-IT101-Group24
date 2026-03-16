@@ -394,15 +394,48 @@ public class MotorPH {
 
                 if (line.trim().isEmpty()) continue; // skip any blank lines in the file
 
-                String[] data = line.split(",");
-                double rangeFrom = Double.parseDouble(data[0].trim()); // column 0: lower bound of salary bracket
-                double rangeTo = Double.parseDouble(data[1].trim()); // column 1: upper bound of salary bracket
-                double rate = Double.parseDouble(data[2].trim()); // column 2: contribution rate for this bracket
+                // Regex split handles quoted fields that contain commas (e.g., "At least 1,000 to 1,500")
+                String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
-                // If monthly gross falls within this bracket, compute the contribution
-                if (monthlyGross >= rangeFrom && monthlyGross <= rangeTo) {
-                    contribution = monthlyGross * rate; // raw contribution before cap is applied
-                    break; // stop searching once the correct bracket is found
+                if (data.length < 2) continue; // skip incomplete rows (e.g., NOTE line)
+
+                // Column 0: salary range text — strip surrounding quotes before parsing
+                String salaryRange = data[0].trim().replace("\"", "");
+
+                // Column 1: employee contribution rate — e.g., "1%" or "2%"
+                String rateText = data[1].trim();
+
+                // Skip rows that are not valid bracket entries (empty cells, NOTE line, etc.)
+                if (salaryRange.isEmpty() || rateText.isEmpty() || !rateText.endsWith("%")) continue;
+
+                // Convert rate from percentage string to decimal: "1%" → 0.01
+                double rate = Double.parseDouble(rateText.replace("%", "").trim()) / 100.0;
+
+                // --- Parse the salary range text and check if monthlyGross falls in it ---
+
+                if (salaryRange.toLowerCase().startsWith("over")) {
+                    // Format: "Over 1,500"
+                    // Extract the floor value and check if gross exceeds it
+                    String floorText = salaryRange.substring("over".length()).trim().replace(",", "");
+                    double floor = Double.parseDouble(floorText);
+
+                    if (monthlyGross > floor) {
+                        contribution = monthlyGross * rate; // raw contribution before cap
+                        break; // stop once correct bracket is found
+                    }
+
+                } else if (salaryRange.toLowerCase().startsWith("at least")) {
+                    // Format: "At least 1,000 to 1,500"
+                    // Strip "At least" prefix, then split on " to " to get lower and upper bounds
+                    String rangeOnly = salaryRange.substring("at least".length()).trim();
+                    String[] parts = rangeOnly.split("(?i)\\s+to\\s+");
+                    double rangeFrom = Double.parseDouble(parts[0].trim().replace(",", ""));
+                    double rangeTo   = Double.parseDouble(parts[1].trim().replace(",", ""));
+
+                    if (monthlyGross >= rangeFrom && monthlyGross <= rangeTo) {
+                        contribution = monthlyGross * rate; // raw contribution before cap
+                        break; // stop once correct bracket is found
+                    }
                 }
             }
 
