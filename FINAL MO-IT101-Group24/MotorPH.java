@@ -612,7 +612,7 @@ public class MotorPH {
          *
          * @param logIn  raw login time from the attendance CSV
          * @param logOut raw logout time from the attendance CSV
-         * @return total hours worked as a decimal (e.g., 7.5 = 7 hours and 30 minutes)
+         * @return       total hours worked as a decimal (e.g., 7.5 = 7 hours and 30 minutes)
          */
     public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
         
@@ -776,14 +776,14 @@ public class MotorPH {
 
             // First cutoff — no deductions; net equals gross
             System.out.println("\nFirst Cutoff");
-            System.out.println("\nCutoff Date: " + monthName + " 1 to 15");
+            System.out.println("\nCutoff Date: "       + monthName + " 1 to 15");
             System.out.println("Total Hours Worked : " + firstHalf);
             System.out.println("Gross Salary: "        + grossFirst);
             System.out.println("Net Salary: "          + grossFirst);
 
             // Second cutoff — all four government deductions applied here
             System.out.println("\nSecond Cutoff");
-            System.out.println("\nCutoff Date: " + monthName + " 16 to " + daysInMonth);
+            System.out.println("\nCutoff Date: "       + monthName + " 16 to " + daysInMonth);
             System.out.println("Total Hours Worked : " + secondHalf);
             System.out.println("Gross Salary: "        + grossSecond);
             System.out.println("    SSS: "             + sss);
@@ -845,10 +845,10 @@ public class MotorPH {
 
                 // Column 0 = Employee Number — compare against the input
                 if (data[0].equals(employeeNo)) {
-                    employeeNo = data[0]; // Column 0: Employee Number
-                    lastName   = data[1]; // Column 1: Last Name
-                    firstName  = data[2]; // Column 2: First Name
-                    birthday   = data[3]; // Column 3: Birthday
+                    employeeNo = data[0];                             // Column 0: Employee Number
+                    lastName   = data[1];                             // Column 1: Last Name
+                    firstName  = data[2];                             // Column 2: First Name
+                    birthday   = data[3];                             // Column 3: Birthday
                     rate       = Double.parseDouble(data[18].trim()); // Column 18: Hourly Rate
                     found      = true;
                     break;
@@ -945,11 +945,11 @@ public class MotorPH {
 
         // Step 3: Process each employee using the pre-loaded attendance list
         for (String[] employeeData : employees) {
-            String employeeNo = employeeData[0];                              // Column 0: Employee Number
-            String lastName   = employeeData[1];                              // Column 1: Last Name
-            String firstName  = employeeData[2];                              // Column 2: First Name
-            String birthday   = employeeData[3];                              // Column 3: Birthday
-            double rate       = Double.parseDouble(employeeData[18].trim()); // Column 18: Hourly Rate
+            String    employeeNo   = employeeData[0];                             // Column 0: Employee Number
+            String    lastName     = employeeData[1];                             // Column 1: Last Name
+            String    firstName    = employeeData[2];                             // Column 2: First Name
+            String    birthday     = employeeData[3];                             // Column 3: Birthday
+            double    rate         = Double.parseDouble(employeeData[18].trim()); // Column 18: Hourly Rate
 
             processPayroll(employeeNo, lastName, firstName, birthday, rate, attendanceRecords, timeFormat);
         }
