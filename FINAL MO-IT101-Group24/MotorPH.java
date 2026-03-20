@@ -580,163 +580,133 @@ public class MotorPH {
         // Returns the final computed withholding tax amount
         return tax;
     }  
- 
 
 
-    /* =======================================================================================
-        Hours Worked Computation (Method # 5) [ann]
+    /*========================================================================================
+        Hours Worked Computation (Method #5) [ann]
     ==========================================================================================*/
 
         /**
-        * Computes the total hours worked by an employee for a single attendance record (one day).
-        *
-        * Algorithm — three rules are applied in this order:
-        *
-        * Rule 1 — Overtime cap:
-        *   The workday officially ends at 5:00 PM. Any time logged after 5:00 PM is
-        *   not counted. If the employee logs out after 5:00 PM, the logout time is
-        *   replaced with 5:00 PM before any calculation is done.
-        *   Example: if employee logs out 5:30 PM, treated as 5:00 PM.
-        *
-        * Rule 2 — Grace period:
-        *   Employees who log in at or before 8:10 AM are considered on time and their
-        *   login time is adjusted to the standard start of 8:00 AM for computation.
-        *   This prevents minor early arrivals from inflating hours and prevents logins
-        *   between 8:01–8:10 from being penalized.
-        *   Example: if employee logs in 8:05 AM, treated as 8:00 AM.
-        *   Example: if employee logs in 8:30 AM, actual time used (after grace period, no adjustment).
-        *
-        * Rule 3 — Lunch break deduction:
-        *   A mandatory 1-hour (60-minute) unpaid lunch break is always deducted.
-        *   The deduction only applies if the employee worked more than 60 minutes.
-        *   If total time is 60 minutes or less, the result is 0 productive hours.
-        *
-        * Combined example (Rule 2 + Rule 3 applied together):
-        *   Login: 8:05 AM adjusted to 8:00 AM (within grace period)
-        *   Logout: 4:30 PM no cap needed (before 5:00 PM)
-        *   Raw duration: 8:00 AM to 4:30 PM = 8 hours 30 minutes = 510 minutes
-        *   After lunch deduction: 510 − 60 = 450 minutes = 7.5 hours worked
-        *
-        * @param logIn  the employee's raw login time from the attendance CSV
-        * @param logOut the employee's raw logout time from the attendance CSV
-        * @return total hours worked as a decimal (e.g., 7.5 = 7 hours and 30 minutes)
-        */
-
+         * Computes the total hours worked by an employee for a single attendance record (one day).
+         *
+         * Algorithm — three rules are applied in this order:
+         *
+         * Rule 1 — Overtime cap:
+         *   Logout after 5:00 PM is capped at 5:00 PM before any calculation.
+         *   Example: logout 5:30 PM → treated as 5:00 PM.
+         *
+         * Rule 2 — Grace period:
+         *   Login at or before 8:10 AM is adjusted to 8:00 AM for computation.
+         *   This prevents minor early arrivals from inflating hours and avoids
+         *   penalizing logins between 8:01–8:10 AM.
+         *   Example: login 8:05 AM → treated as 8:00 AM.
+         *   Example: login 8:30 AM → used as-is (past grace period).
+         *
+         * Rule 3 — Lunch break deduction:
+         *   A mandatory 60-minute unpaid break is always deducted, but only if
+         *   the employee worked more than 60 minutes. Otherwise result is 0.
+         *
+         * Combined example (Rule 2 + Rule 3):
+         *   Login 8:05 AM → 8:00 AM | Logout 4:30 PM → no cap needed
+         *   510 min raw − 60 min lunch = 450 min = 7.5 hours worked
+         *
+         * @param logIn  raw login time from the attendance CSV
+         * @param logOut raw logout time from the attendance CSV
+         * @return total hours worked as a decimal (e.g., 7.5 = 7 hours and 30 minutes)
+         */
     public static double computeHoursWorked(LocalTime logIn, LocalTime logOut) {
         
-        final LocalTime GRACE_PERIOD = LocalTime.of(8, 10); // grace period ends at 8:10 AM (inclusive)
-        final LocalTime STANDARD_START = LocalTime.of(8, 0); // standard start of workday: 8:00 AM
-        final LocalTime CUTOFF_TIME = LocalTime.of(17, 0); // official end of workday: 5:00 PM
-        final int LUNCH_BREAK = 60;
+        final LocalTime GRACE_PERIOD   = LocalTime.of(8, 10); // grace period ends at 8:10 AM (inclusive)
+        final LocalTime STANDARD_START = LocalTime.of(8,  0); // official workday start
+        final LocalTime CUTOFF_TIME    = LocalTime.of(17, 0); // official workday end
+        final int       LUNCH_BREAK    = 60;                  // unpaid break in minutes
 
-        // Prevent invalid attendance records
+        // Guard against corrupted or reversed time entries in the CSV
         if (logOut.isBefore(logIn)) {
             return 0;
         }
 
-        // Rule 1: If the employee logged out after 5:00 PM, cap the logout at 5:00 PM.
-        // This ensures overtime is not counted in the hours worked calculation.
+        // Rule 1: Cap logout at 5:00 PM — time past this is not counted
         if (logOut.isAfter(CUTOFF_TIME)) {
             logOut = CUTOFF_TIME;
         }
 
-        // Rule 2: If the employee logged in at or before the grace period (8:10 AM),
-        // treat the login as the standard start time (8:00 AM). This covers both
-        // exact 8:00 AM logins and early arrivals up to 8:10 AM.
+        // Rule 2: Treat login as 8:00 AM if within the grace window (at or before 8:10 AM)
         if (!logIn.isAfter(GRACE_PERIOD)) {
             logIn = STANDARD_START;
         }
 
-        // This line calculates the total number of minutes worked by the employee between the login and logout times.
-        long  minutesWorked = Duration.between(logIn, logOut).toMinutes();
+        long minutesWorked = Duration.between(logIn, logOut).toMinutes();
 
-        // Rule 3: Deduct the mandatory 60-minute lunch break.
-        // The deduction only applies if the employee was present for more than an hour.
-        // If 60 minutes or less were logged, no productive work time is counted.
+        // Rule 3: Subtract the mandatory lunch break; if 60 min or less was logged, result is 0
         if (minutesWorked > LUNCH_BREAK) {
             minutesWorked -= LUNCH_BREAK;
         } else {
             minutesWorked = 0;
         }
 
-        // Convert remaining minutes to hours and return
-        return minutesWorked / 60.0;
-            
+        return minutesWorked / 60.0;            
     }
 
 
-
     /*========================================================================================
-        Gross Computation (Method # 6) [ann]
+        Gross Computation (Method #6) [ann]
     ==========================================================================================*/
 
         /**
-        * Computes the gross salary for a single cutoff period.
-        *
-        * Algorithm:
-        * Gross salary is calculated by multiplying the total hours worked in the
-        * cutoff period by the employee's hourly rate. This method is called twice
-        * per month — once for the first cutoff (days 1–15) and once for the second
-        * cutoff (days 16–end of month).
-        *
-        * Per process flow: allowances are not included in the gross salary.
-        * Only hours worked multiplied by the hourly rate is counted.
-        *
-        * @param hours the total number of hours worked during the cutoff period
-        * @param rate  the employee's hourly rate (read from column 18 of details.csv)
-        * @return the gross salary for the cutoff period
-        */
-
+         * Computes the gross salary for a single cutoff period.
+         *
+         * Algorithm:
+         * Gross salary = total hours worked × hourly rate.
+         * Called twice per month — once for the first cutoff (days 1–15) and
+         * once for the second cutoff (days 16–end). Allowances are excluded per process flow.
+         *
+         * @param hours total hours worked during the cutoff period
+         * @param rate  employee's hourly rate (column 18 of details.csv)
+         * @return gross salary for the cutoff period
+         */
     static double computeGross(double hours, double rate) {
         return hours * rate;
-
     }
 
 
-
     /*========================================================================================
-        Payroll Computation and Display (Method # 7) [rosella]
+        Payroll Computation and Display (Method #7) [rosella]
     ==========================================================================================*/
 
         /**
-        * Computes and displays the full payroll report for a single employee,
-        * covering all months from June to December 2024.
-        *
-        * Algorithm — Per Month (June to December):
-        * 1. Loop through all attendance records and filter those belonging to this
-        *    employee in the current month.
-        * 2. For each matching record, parse the login and logout times, compute
-        *    hours worked using computeHoursWorked(), and accumulate into the correct
-        *    cutoff period: days 1–15 = firstHalf, days 16–end = secondHalf.
-        * 3. Compute gross salary for each cutoff: hours × hourly rate.
-        * 4. Combine both cutoff gross amounts into monthlyGross. Government deductions
-        *    (SSS, PhilHealth, Pag-IBIG, Tax) are all computed from this combined figure,
-        *    not from the second cutoff gross alone. This follows the process flow rule
-        *    that says "add the 1st and 2nd cutoff amounts first before computing deductions."
-        * 5. Net salary on the second cutoff = secondHalf gross − totalDeductions.
-        *    The first cutoff has no deductions, so its net equals its gross.
-        *
-        * Process Flow Output Per Cutoff:
-        *   First Cutoff  (1–15):  Total Hours Worked, Gross Salary, Net Salary
-        *   Second Cutoff (16–30): Total Hours Worked, Gross Salary, SSS, PhilHealth,
-        *                          Pag-IBIG, Tax, Total Deductions, Net Salary
-        *
-        * @param employeeNo is the employee number (consistent name used throughout)
-        * @param lastName is the employee's last name
-        * @param firstName is the employee's first name
-        * @param birthday is the employee's birthday
-        * @param rate is the employee's hourly rate from column 18 of details.csv
-        * @param attendanceRecords all attendance records pre-loaded into memory
-        * @param timeFormat is DateTimeFormatter for parsing H:mm time values from the CSV
-        */
-
-
+         * Computes and displays the full payroll report for a single employee,
+         * covering all months from June to December 2024.
+         *
+         * Algorithm — Per Month (June to December):
+         * 1. Filter attendance records by employee number and current month.
+         * 2. Parse login/logout times, compute hours via computeHoursWorked(), and
+         *    accumulate into the correct cutoff: days 1–15 = firstHalf, days 16–end = secondHalf.
+         * 3. Compute gross salary for each cutoff: hours × hourly rate.
+         * 4. Combine both cutoffs into monthlyGross. Deductions (SSS, PhilHealth, Pag-IBIG, Tax)
+         *    are all computed from this combined figure — not from the second cutoff alone.
+         *    Per process flow: "add 1st and 2nd cutoff amounts first before computing deductions."
+         * 5. Net salary on the second cutoff = secondHalf gross − totalDeductions.
+         *    The first cutoff has no deductions — its net equals its gross.
+         *
+         * Process Flow Output Per Cutoff:
+         *   First Cutoff  (1–15):  Total Hours Worked, Gross Salary, Net Salary
+         *   Second Cutoff (16–30): Total Hours Worked, Gross Salary, SSS, PhilHealth,
+         *                          Pag-IBIG, Tax, Total Deductions, Net Salary
+         *
+         * @param employeeNo        employee number — used to filter attendance records
+         * @param lastName          employee's last name
+         * @param firstName         employee's first name
+         * @param birthday          employee's birthday
+         * @param rate              hourly rate from column 18 of details.csv
+         * @param attendanceRecords all attendance records pre-loaded into memory
+         * @param timeFormat        formatter for parsing H:mm time values from the CSV
+         */
     public static void processPayroll(String employeeNo, String lastName, String firstName,
                                       String birthday, double rate,
                                       List<String[]> attendanceRecords,
                                       DateTimeFormatter timeFormat) {
 
-        // Display the employee's basic header information
         System.out.println("\n==================================== ");
         System.out.println("           Employee Payroll          ");
         System.out.println("==================================== ");
@@ -745,73 +715,54 @@ public class MotorPH {
         System.out.println("Birthday : "      + birthday);
         System.out.println("===================================\n");
 
-        // Iterate over each month from June (6) to December (12) per process flow requirement
+        // June (6) to December (12) per process flow requirement
         for (int month = 6; month <= 12; month++) {
 
-            double firstHalf  = 0; // accumulates hours worked from days 1–15 (first cutoff)
-            double secondHalf = 0; // accumulates hours worked from days 16–end (second cutoff)
+            double firstHalf  = 0; // hours worked days 1–15
+            double secondHalf = 0; // hours worked days 16–end
 
-            // 'YearMonth.lengthOfMonth()' returns the actual last calendar day of the month
-            // (e.g., 30 for June, 31 for July) — used for the second cutoff end date display
+            // lengthOfMonth() gives the correct last day (e.g., 30 for June, 31 for July)
             int daysInMonth = YearMonth.of(2024, month).lengthOfMonth();
 
-            // Scan all attendance records and pick only those that belong to this
-            // employee and fall within the current month of 2024
             for (String[] data : attendanceRecords) {
 
-                // Column 0 of the attendance CSV is the employee number —
-                // skip this record if it does not belong to the current employee
-                if (!data[0].equals(employeeNo)) continue;
+                if (!data[0].equals(employeeNo)) continue; // Column 0 = employee number
 
-                // Column 3 is the date in MM/DD/YYYY format — split by "/" to extract parts
-                String[] dateParts = data[3].split("/");
-                int recordMonth = Integer.parseInt(dateParts[0]); // month portion of the date
-                int day = Integer.parseInt(dateParts[1]); // day portion of the date
-                int year = Integer.parseInt(dateParts[2]); // year portion of the date
+                // Column 3 is the date in MM/DD/YYYY format — split to get month, day, and year
+                String[] dateParts   = data[3].split("/");
+                int      recordMonth = Integer.parseInt(dateParts[0]);
+                int      day         = Integer.parseInt(dateParts[1]);
+                int      year        = Integer.parseInt(dateParts[2]);
 
-                // Skip records that are outside the current loop's month or year
                 if (year != 2024 || recordMonth != month) continue;
 
                 // Column 4 = login time, Column 5 = logout time — both in H:mm format
                 LocalTime login  = LocalTime.parse(data[4].trim(), timeFormat);
                 LocalTime logout = LocalTime.parse(data[5].trim(), timeFormat);
 
-                // Apply grace period, overtime cap, and lunch break rules for this day
                 double hours = computeHoursWorked(login, logout);
 
-                // Add to the correct cutoff bucket based on the day of the month
-                if (day <= 15) firstHalf  += hours; // days 1–15 belong to the first cutoff
-                else secondHalf += hours; // days 16 and beyond belong to the second cutoff
+                if (day <= 15) firstHalf  += hours; // days 1–15: first cutoff
+                else           secondHalf += hours; // days 16–end: second cutoff
             }
 
-            // Compute gross salary for each cutoff: total hours × hourly rate
-            double grossFirst = computeGross(firstHalf,  rate);
+            double grossFirst  = computeGross(firstHalf,  rate);
             double grossSecond = computeGross(secondHalf, rate);
 
-            // Combine both cutoffs into the monthly gross.
-            // Government deductions are computed from this combined figure, not from either
-            // cutoff alone. This follows the process flow rule: "add 1st and 2nd cutoff
-            // amounts first before computing deductions."
+            // Deductions are based on the combined monthly gross, not per-cutoff gross
             double monthlyGross = grossFirst + grossSecond;
+            double sss          = computeSSS(monthlyGross);
+            double pagibig      = computePagibig(monthlyGross);
+            double philhealth   = computePhilhealth(monthlyGross);
 
-            // Compute each government deduction using the combined monthly gross
-            double sss = computeSSS(monthlyGross);
-            double pagibig = computePagibig(monthlyGross);
-            double philhealth = computePhilhealth(monthlyGross);
-
-            // totalContribution is used as the input to withholdingTax() because BIR rules
-            // require that contributions be deducted from gross before tax is computed
+            // BIR rule: contributions must be deducted from gross before tax is computed
             double totalContribution = sss + philhealth + pagibig;
-            double tax = withholdingTax(monthlyGross, totalContribution);
+            double tax               = withholdingTax(monthlyGross, totalContribution);
+            double totalDeductions   = sss + pagibig + philhealth + tax;
 
-            // Total deductions = all four government contributions added together
-            double totalDeductions = sss + pagibig + philhealth + tax;
-
-            // Net salary = second cutoff gross minus all deductions.
-            // Deductions are applied on the second payout only, per process flow.
+            // Deductions are applied on the second cutoff payout only, per process flow.
             double netSalary = grossSecond - totalDeductions;
 
-            // Convert the numeric month to its full name string for display purposes
             String monthName = switch (month) {
                 case 6  -> "June";
                 case 7  -> "July";
@@ -823,32 +774,24 @@ public class MotorPH {
                 default -> "Month " + month;
             };
 
-            /*--------------------------------------------------------------------
-                Display First Cutoff (e.g., June 1 to June 15)
-                No government deductions are applied on the first cutoff.
-                Net Salary equals Gross Salary for this payout period.
-            ---------------------------------------------------------------------*/
+            // First cutoff — no deductions; net equals gross
             System.out.println("\nFirst Cutoff");
             System.out.println("\nCutoff Date: " + monthName + " 1 to 15");
             System.out.println("Total Hours Worked : " + firstHalf);
-            System.out.println("Gross Salary: " + grossFirst);
-            System.out.println("Net Salary: " + grossFirst); // no deductions on first cutoff
+            System.out.println("Gross Salary: "        + grossFirst);
+            System.out.println("Net Salary: "          + grossFirst);
 
-            /*--------------------------------------------------------------------
-                Display Second Cutoff (e.g., June 16 to June 30)
-                All government deductions (SSS, PhilHealth, Pag-IBIG, Tax) are
-                applied here. daysInMonth is used for the correct end date.
-            ---------------------------------------------------------------------*/
+            // Second cutoff — all four government deductions applied here
             System.out.println("\nSecond Cutoff");
             System.out.println("\nCutoff Date: " + monthName + " 16 to " + daysInMonth);
             System.out.println("Total Hours Worked : " + secondHalf);
-            System.out.println("Gross Salary: " + grossSecond);
-            System.out.println("    SSS: " + sss);
-            System.out.println("    PhilHealth: " + philhealth);
-            System.out.println("    Pag-IBIG: " + pagibig);
-            System.out.println("    Tax: " + tax);
-            System.out.println("Total Deductions: " + totalDeductions);
-            System.out.println("Net Salary: " + netSalary);
+            System.out.println("Gross Salary: "        + grossSecond);
+            System.out.println("    SSS: "             + sss);
+            System.out.println("    PhilHealth: "      + philhealth);
+            System.out.println("    Pag-IBIG: "        + pagibig);
+            System.out.println("    Tax: "             + tax);
+            System.out.println("Total Deductions: "    + totalDeductions);
+            System.out.println("Net Salary: "          + netSalary);
             System.out.println("-----------------------------------\n");
         }
 
@@ -856,71 +799,59 @@ public class MotorPH {
         System.out.println("          END OF RECORD");
         System.out.println("=====================================");
     }
-
-
               
         
     /*========================================================================================
-        For One Employee (Method # 8) [rosella]
+        For One Employee (Method #8) [rosella]
     ==========================================================================================*/
 
         /**
-        * Processes and displays the payroll report for a single employee.
-        *
-        * Algorithm:
-        * 1. Opens the employee CSV and searches line by line for the row whose
-        *    first column matches the given employeeNo.
-        *    - The regex split pattern ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)" is used
-        *      instead of a plain "," split to handle fields that contain commas
-        *      inside quoted values (e.g., "Dela Cruz, Juan" in a name field).
-        *    - If no match is found, the method prints an error and returns early
-        *      to stop execution — it does not proceed to load attendance data.
-        * 2. Loads all attendance records from the attendance CSV into a List once.
-        *    Loading into memory before the monthly loop avoids reopening the file
-        *    for every month (June through December), which would be 7 file reads
-        *    per employee instead of just 1.
-        * 3. Delegates the actual payroll computation and display to 'processPayroll()'.
-        *
-        * Process Flow (payroll_staff to Process Payroll to One Employee):
-        * - If employee not found: display "Employee number does not exist." and stop.
-        * - If found: display payroll records from June to December with both cutoffs.
-        *
-        * @param employeeNo the employee number entered by the payroll staff in main()
-        */
-
-
+         * Processes and displays the payroll report for a single employee.
+         *
+         * Algorithm:
+         * 1. Opens details.csv and searches line by line for the row matching employeeNo.
+         *    Uses regex split to handle commas inside quoted fields (e.g., addresses).
+         *    If no match is found, prints an error and returns — does not load attendance.
+         * 2. Loads all attendance records into memory once before the monthly loop.
+         *    Avoids reopening the file for each month (7 reads → 1 read).
+         * 3. Delegates computation and display to processPayroll().
+         *
+         * Process Flow (payroll_staff → Process Payroll → One Employee):
+         * - If employee not found: display "Employee number does not exist." and stop.
+         * - If found: display payroll records from June to December with both cutoffs.
+         *
+         * @param employeeNo the employee number entered by the payroll staff
+         */
     public static void oneEmployee(String employeeNo) {
 
-        // H:mm handles both single-digit hours (e.g., 8:05) and double-digit (e.g., 17:00)
+        // H:mm handles both single-digit (e.g., 8:05) and double-digit hours (e.g., 17:00)
         DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
 
-        // Variables to store the matched employee's details from the employee CSV file
-        String lastName = "";
-        String firstName = "";
-        String birthday = "";
-        boolean found = false;
-        double rate = 0;
+        String  lastName  = "";
+        String  firstName = "";
+        String  birthday  = "";
+        boolean found     = false;
+        double  rate      = 0;
 
-        // Search the employee file for a record matching the entered employee number
         try (BufferedReader br = new BufferedReader(new FileReader(EMP_FILE))) {
             br.readLine(); // skip header row
             String line;
 
             while ((line = br.readLine()) != null) {
-                if (line.trim().isEmpty()) continue; // skip blank lines in the CSV
+                if (line.trim().isEmpty()) continue;
 
-                // This regex split handles commas inside quoted fields correctly.
+                // Regex split handles commas inside quoted fields (e.g., addresses)
                 String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
                 // Column 0 = Employee Number — compare against the input
                 if (data[0].equals(employeeNo)) {
-                    employeeNo = data[0]; // Column 1: Last Name
-                    lastName = data[1]; // Column 2: First Name
-                    firstName = data[2]; // Column 3: Birthday
-                    birthday = data[3];
-                    rate = Double.parseDouble(data[18].trim()); // Column 18: Hourly Rate
-                    found = true;
-                    break; // if match found, stop reading the file
+                    employeeNo = data[0]; // Column 0: Employee Number
+                    lastName   = data[1]; // Column 1: Last Name
+                    firstName  = data[2]; // Column 2: First Name
+                    birthday   = data[3]; // Column 3: Birthday
+                    rate       = Double.parseDouble(data[18].trim()); // Column 18: Hourly Rate
+                    found      = true;
+                    break;
                 }
             }
 
@@ -928,15 +859,13 @@ public class MotorPH {
             System.out.println("Error reading employee file.");
         }
 
-        // Per process flow: if the employee number does not exist, show the message
-        // and return immediately — do not proceed to load attendance or compute payroll
+        // Stop here if no matching employee number was found
         if (!found) {
             System.out.println("\nEmployee number does not exist.\n");
             return;
         }
 
-        // Load all attendance records into a List before the monthly loop.
-        // (avoids repeatedly reopening the file for each month — June to December)
+        // Load all attendance records once — avoids reopening the file per month (June–December)
         List<String[]> attendanceRecords = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(ATT_FILE))) {
             br.readLine(); // skip header row
@@ -944,9 +873,7 @@ public class MotorPH {
 
             while ((line = br.readLine()) != null) {
                 if (!line.trim().isEmpty())
-
-                    // Same regex split as above — needed because attendance fields
-                    // may also contain quoted values with embedded commas
+                    // Same regex split — attendance fields may also contain commas inside quotes
                     attendanceRecords.add(line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"));
             }
 
@@ -954,56 +881,45 @@ public class MotorPH {
             System.out.println("Error reading attendance file.");
         }
 
-        // Hand off to the shared payroll method which handles the monthly loop,
-        // deduction computations, and all output display
         processPayroll(employeeNo, lastName, firstName, birthday, rate, attendanceRecords, timeFormat);
     }
 
 
-
-    /* =======================================================================================
-        For All Employee (Method # 9) [rosella]
+    /*========================================================================================
+        For All Employees (Method #9) [rosella]
     ==========================================================================================*/
 
         /**
-        * Processes and displays the payroll report for every employee in the CSV file.
-        *
-        * Algorithm:
-        * 1. Reads all employee records from details.csv into a 'List<String[]>'.
-        *    Each element of the list is one employee's row of data.
-        * 2. Loads all attendance records from attendance.csv into a separate
-        *    'List<String[]>' once, before the employee loop begins.
-        *    This is a deliberate performance decision: if attendance were loaded
-        *    inside the loop, the file would be reopened for every employee AND
-        *    for every month (up to 34 × 7 = 238 file reads). Loading once and
-        *    passing the in-memory list to 'processPayroll()' reduces this to 1 read.
-        * 3. For each employee, delegates to 'processPayroll()' which filters the
-        *    pre-loaded attendance list to find that employee's records.
-        *
-        * Process Flow (payroll_staff to Process Payroll to All Employees):
-        * - Follows the same output format as 'oneEmployee()' from (Method #8).
-        * - Automatically processes all employees without requiring an employee number.
-        *
-        * This method takes no parameters because it processes all employees by design.
-        */
-
-
+         * Processes and displays the payroll report for every employee in the CSV file.
+         *
+         * Algorithm:
+         * 1. Reads all employee records from details.csv into a List<String[]>.
+         * 2. Loads all attendance records into a separate List<String[]> once, before
+         *    the employee loop begins. This avoids reopening the file per employee —
+         *    up to 34 employees × 7 months = 238 reads reduced to just 1.
+         * 3. For each employee, delegates to processPayroll() which filters the
+         *    pre-loaded attendance list internally.
+         *
+         * Process Flow (payroll_staff → Process Payroll → All Employees):
+         * - Follows the same output format as oneEmployee() (Method #8).
+         * - Automatically processes all employees without requiring an employee number.
+         *
+         * This method takes no parameters because it processes all employees by design.
+         */
     public static void allEmployee() {
 
-        // H:mm handles both single-digit hours (e.g., 8:05) and double-digit (e.g., 17:00)
+        // H:mm handles both single-digit (e.g., 8:05) and double-digit hours (e.g., 17:00)
         DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
 
-        // This list will hold one String[] per employee row read from details.csv file
         List<String[]> employees = new ArrayList<>();
 
-        // Step 1: Read and store all employee records from the employee file
+        // Step 1: Read all employee records from details.csv
         try (BufferedReader br = new BufferedReader(new FileReader(EMP_FILE))) {
             br.readLine(); // skip header row
             String line;
 
             while ((line = br.readLine()) != null) {
-
-                // Regex split handles fields that contain commas inside quoted values
+                // Regex split handles commas inside quoted fields (e.g., addresses)
                 String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
                 employees.add(data);
             }
@@ -1012,9 +928,7 @@ public class MotorPH {
             System.out.println("Error reading employee file.");
         }
 
-        // Step 2: Load all attendance records into memory once before the employee loop.
-        // Passing this pre-loaded list to processPayroll() for the attendance file
-        // to be read only once for all employees, not once per employee per month.
+        // Step 2: Load attendance records once — reused for every employee in the loop below
         List<String[]> attendanceRecords = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(ATT_FILE))) {
             br.readLine(); // skip header row
@@ -1024,18 +938,18 @@ public class MotorPH {
                 if (!line.trim().isEmpty())
                     attendanceRecords.add(line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"));
             }
+
         } catch (IOException e) {
             System.out.println("Error reading attendance file.");
         }
 
-        // Step 3: Loop through each employee and delegate payroll computation
-        // and display to the shared processPayroll() method
+        // Step 3: Process each employee using the pre-loaded attendance list
         for (String[] employeeData : employees) {
-            String employeeNo = employeeData[0]; // Column 0: Employee Number
-            String lastName = employeeData[1]; // Column 1: Last Name
-            String firstName = employeeData[2]; // Column 2: First Name
-            String birthday = employeeData[3]; // Column: Birthday
-            double rate = Double.parseDouble(employeeData[18].trim()); // hourly rate at column index 18
+            String employeeNo = employeeData[0];                              // Column 0: Employee Number
+            String lastName   = employeeData[1];                              // Column 1: Last Name
+            String firstName  = employeeData[2];                              // Column 2: First Name
+            String birthday   = employeeData[3];                              // Column 3: Birthday
+            double rate       = Double.parseDouble(employeeData[18].trim()); // Column 18: Hourly Rate
 
             processPayroll(employeeNo, lastName, firstName, birthday, rate, attendanceRecords, timeFormat);
         }
