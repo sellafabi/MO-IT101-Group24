@@ -140,13 +140,13 @@ public class MotorPH {
                         if(line.trim().isEmpty()) continue; // skip blank lines in the CSV file
 
                         // Split the line by comma to access individual columns
-                        String[] empData = line.split(",");
+                        String[] employeeRow = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
                         // Column 0 = Employee Number; compare against what the user typed
-                        if (empData[0].equals(employeeNo)){
-                            lastName = empData[1]; // Column 1: Last Name
-                            firstName  = empData[2]; // Column 2: First Name
-                            birthday = empData[3]; // Column 3: Birthday
+                        if (employeeRow[0].equals(employeeNo)){
+                            lastName = employeeRow[1]; // Column 1: Last Name
+                            firstName  = employeeRow[2]; // Column 2: First Name
+                            birthday = employeeRow[3]; // Column 3: Birthday
                             found = true;
                             break; // stop searching once a match is found
                         }
