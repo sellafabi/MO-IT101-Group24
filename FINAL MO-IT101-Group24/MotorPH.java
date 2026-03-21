@@ -189,93 +189,69 @@ public class MotorPH {
                 System.exit(0); // program terminated
             }
     }
+}
+
+
 
     public static void payrollMenu() {
-                /*------------------------------------------------------------------------
-            PAYROLL STAFF LOGIN
-            The "payroll_staff" role grants access to payroll processing.
-            Staff can compute and view payroll records for one specific employee
-            or for all employees at once, covering June to December 2024.
-        -------------------------------------------------------------------------*/
-        }else { 
+                
+        if (isPayrollStaff) {
+            System.out.println("\nPayroll staff Login successful!");
 
-            System.out.println("\nPayroll staff Login successful!");;
-
-            // Display the payroll staff menu after successful login
+            // Display the payroll staff menu after a successful login.
             System.out.println("\n==================================== ");
             System.out.println("\n1. Process Payroll");
             System.out.println("2. Exit program");
             System.out.print("Choose Option: ");
             String option = sc.nextLine();
             System.out.println("\n====================================");
-            
-            /*--------------------------------------------------------------------
-                Option 1: Process Payroll
-                Allowances are NOT included in gross salary computation, per the
-                process flow requirement. The payroll staff is then shown a
-                sub-menu to choose between one employee or all employees.
-            ---------------------------------------------------------------------*/
+
+            // Option 1: Grants user an access to process the payroll of a single or all employees, and a choice to terminate the program.
             if (option.equals("1")) {
                 System.out.println("\n1. View One Employee");
                 System.out.println("2. View All Employees");
                 System.out.println("3. Exit program");
                 System.out.print("Choose Sub-option: ");
                 String subOption = sc.nextLine();
-                
-                                
-                /*----------------------------------------------------------------
-                    Sub-option 1: One Employee
-                    The payroll staff enters a specific employee number.
-                    The program searches for that employee and, if found,
-                    delegates the full payroll computation and display to
-                    the oneEmployee() method, which covers June to December.
-                      Per cutoff:
-                        First Cutoff  (1–15):  Total Hours Worked, Gross, Net Salary
-                        Second Cutoff (16–30): Total Hours Worked, Gross, 
-                                               Each Deduction (SSS, PhilHealth, Pag-IBIG, Tax), 
-                                               Total Deductions, Net Salary
-                -----------------------------------------------------------------*/
-                if (subOption.equals("1")){
+
+                // Sub-option 1: Asks the user for a valid employee number and displays the full payroll computation processed in oneEmployee() method.
+            if (subOption.equals("1")) {
                 System.out.print("\nEnter Employee Number: ");
                 String employeeNo = sc.nextLine();
                 System.out.println("\n====================================\n");
                 oneEmployee(employeeNo); // standardized name: employeeNo
 
-                /*------------------------------------------------------------
-                    Sub-option 2: All Employees
-                    Delegates to allEmployee(), which processes every employee
-                    in the CSV file using the same display format as Sub-option 1.
-                -------------------------------------------------------------*/
-                } else if (subOption.equals("2")){
-                    allEmployee(); // delegate payroll processing to allEmployee()
+                    // Sub-option 2: Displays the full payroll computation of all employees processed in allEmployee() method.
+            } else if (subOption.equals("2")) {
+                allEmployee(); // delegate payroll processing to allEmployee()
 
-                /*------------------------------------------------------------
-                    Sub-option 3: Exit the program
-                -------------------------------------------------------------*/
-                } else if (subOption.equals("3")){
-                    System.out.println("\nExiting program.\n");
-                    sc.close();
-                    System.exit(0);
+                    // Sub-option 3: Exits the program
+            } else if (subOption.equals("3")) {
+                System.out.println("\nExiting program.\n");
+                System.exit(0);
 
-                // Added feature - Any input other than "1", "2", or "3" is not valid 
-                } else {
-                    System.out.println("\nInvalid option. Please enter 1, 2, or 3.\n");
-                }
+                    // Added feature: Any input other than "1", "2", or "3" is not valid
+            } else {
+                System.out.println("\nInvalid option. Please enter 1, 2, or 3.\n");
+            }
 
-            /*--------------------------------------------------------------------
-                Option 2 — Exit
-            ---------------------------------------------------------------------*/
-            } else if (option.equals("2")) {
-                    System.out.println("\nExiting program.\n");
-                    sc.close();
-                    System.exit(0);
+                // Option 2: Exits the program.
+        } else if (option.equals("2")) {
+            System.out.println("\nExiting program.\n");
+            System.exit(0);
 
-            // Added feature - Invalid option — only 1 or 2 are accepted 
+                // Added feature - Invalid option — only 1 or 2 are accepted
             } else {
                 System.out.println("\nInvalid option. Please enter 1 or 2.\n");
             }
-        } 
-    }
+
+        // If the credentials are incorrect, the system displays an error message and terminates the program.
+        } else {
+                System.out.println("\nIncorrect username and/or password.\n");
+                System.exit(0);
+            }            
+} 
+    
 
 
 
