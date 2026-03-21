@@ -153,11 +153,8 @@ public class MotorPH {
                     System.out.println("\nEmployee file error.\n");
                 }
                 
-
-
-                // Per process flow: display employee's number, name, and birthday if found
                 if (found){
-
+                    printEmployeeInfo (employeeNo, lastName, firstName, birthday);
                     
                     // Per process flow: if no matching record was found, display this message
                 } else {
@@ -181,8 +178,6 @@ public class MotorPH {
                 System.exit(0); // program terminated
             }
     }
-
-
 
 
     public static void payrollMenu() {
