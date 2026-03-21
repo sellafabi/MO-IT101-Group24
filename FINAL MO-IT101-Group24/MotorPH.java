@@ -35,7 +35,11 @@ public class MotorPH {
     static final String PAYROLL_USERNAME = "payroll_staff";
     static final String PASSWORD         = "12345";
 
+    static List<String[]> sssTable     = new ArrayList<>();
+    static List<String[]> pagibigTable = new ArrayList<>();
+
     public static void main(String[] args) {
+        loadTables();
         String role = handleLogin();
 
         if (role.equals(EMP_USERNAME)) {
@@ -174,7 +178,6 @@ public class MotorPH {
                 // Added feature - Any input other than "1" or "2" is not a valid menu option 
             } else {
                 System.out.println("\nInvalid option. Please enter 1 or 2.\n");
-                sc.close();
                 System.exit(0); // program terminated
             }
     }
@@ -229,14 +232,30 @@ public class MotorPH {
                 System.out.println("\nInvalid option. Please enter 1 or 2.\n");
             }
 
-        // If the credentials are incorrect, the system displays an error message and terminates the program.
-        
-                System.out.println("\nIncorrect username and/or password.\n");
-                System.exit(0);
+            System.exit(0);
     }            
     
     
+    public static void loadTables() {
+        try (BufferedReader br = new BufferedReader(new FileReader(SSS_FILE))) {
+            br.readLine();
+            String line;
+            while ((line = br.readLine()) != null)
+                if (!line.trim().isEmpty()) sssTable.add(line.split(","));
+        } catch (IOException e) {
+            System.out.println("Error: SSS table file not found. Check that sss.csv exists in src/.");
+        }
 
+        try (BufferedReader br = new BufferedReader(new FileReader(PAGIBIG_FILE))) {
+            br.readLine();
+            String line;
+            while ((line = br.readLine()) != null)
+                if (!line.trim().isEmpty())
+                    pagibigTable.add(line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"));
+        } catch (IOException e) {
+            System.out.println("Error: Pag-IBIG table file not found. Check that pagibig.csv exists in src/.");
+        }
+    }
 
 
   
@@ -276,46 +295,20 @@ public class MotorPH {
         // This acts as a safety fallback if the loop finishes without a bracket match.
         double lastEmployeeShare = 0;
 
-        try (BufferedReader br = new BufferedReader(new FileReader(SSS_FILE))) {
+        for (String[] sssRow : sssTable) {
+            double rangeFrom     = Double.parseDouble(sssRow[0].trim());
+            String rangeToText   = sssRow[1].trim();
+            double employeeShare = Double.parseDouble(sssRow[3].trim());
+            lastEmployeeShare    = employeeShare;
 
-            br.readLine(); // skip header row of the SSS table
-            String line;
-
-            while ((line = br.readLine()) != null) {
-
-                if (line.trim().isEmpty()) continue; // skip any blank lines in the file
-
-                String[] sssData = line.split(",");
-                double rangeFrom = Double.parseDouble(sssData[0].trim()); // column 0: lower bound of salary bracket
-                String rangeToText = sssData[1].trim(); // column 1: upper bound, may be "Over" for the last bracket
-                double employeeShare = Double.parseDouble(sssData[3].trim()); // column 3: SSS employee contribution for this bracket
-
-                // Keep track of the current share so we have a value to return
-                // if we reach the end of the table without an exact bracket match
-                lastEmployeeShare = employeeShare;
-
-                // "Over" means there is no upper limit — any salary at or above
-                // rangeFrom qualifies for this maximum bracket
-                if (rangeToText.equalsIgnoreCase("Over")) {
-                    if (monthlyGross >= rangeFrom) {
-                        return employeeShare;
-                    }
-
-                } else {
-                    double rangeTo = Double.parseDouble(rangeToText);
-
-                    // Check if the monthly gross falls within this SSS salary bracket
-                    if (monthlyGross >= rangeFrom && monthlyGross <= rangeTo) {
-                        return employeeShare; // return the matched contribution amount
-                    }
-                }
+            if (rangeToText.equalsIgnoreCase("Over")) {
+                if (monthlyGross >= rangeFrom) return employeeShare;
+            } else {
+                double rangeTo = Double.parseDouble(rangeToText);
+                if (monthlyGross >= rangeFrom && monthlyGross <= rangeTo) return employeeShare;
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
-        // Return the last bracket's share as a fallback if no range matched
         return lastEmployeeShare;
         
     }
@@ -351,67 +344,40 @@ public class MotorPH {
 
         double contribution = 0;
 
-        try (BufferedReader br = new BufferedReader(new FileReader(PAGIBIG_FILE))) {
+        for (String[] pagibigRow : pagibigTable) {
 
-            br.readLine(); // skip header row of the Pag-IBIG table
-            String line;
+            if (pagibigRow.length < 2) continue;
 
-            while ((line = br.readLine()) != null) {
+            String salaryRange = pagibigRow[0].trim().replace("\"", "");
+            String rateText    = pagibigRow[1].trim();
 
-                if (line.trim().isEmpty()) continue; // skip any blank lines in the file
+            if (salaryRange.isEmpty() || rateText.isEmpty() || !rateText.endsWith("%")) continue;
 
-                // Regex split handles quoted fields that contain commas (e.g., "At least 1,000 to 1,500")
-                String[] pagibigData = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+            double rate = Double.parseDouble(rateText.replace("%", "").trim()) / 100.0;
 
-                if (pagibigData.length < 2) continue; // skip incomplete rows (e.g., NOTE line)
+            if (salaryRange.toLowerCase().startsWith("over")) {
+                String floorText = salaryRange.substring("over".length()).trim().replace(",", "");
+                double floor     = Double.parseDouble(floorText);
 
-                // Column 0: salary range text — strip surrounding quotes before parsing
-                String salaryRange = pagibigData[0].trim().replace("\"", "");
+                if (monthlyGross > floor) {
+                    contribution = monthlyGross * rate;
+                    break;
+                }
 
-                // Column 1: employee contribution rate — e.g., "1%" or "2%"
-                String rateText = pagibigData[1].trim();
+            } else if (salaryRange.toLowerCase().startsWith("at least")) {
+                String rangeOnly = salaryRange.substring("at least".length()).trim();
+                String[] parts   = rangeOnly.split("(?i)\\s+to\\s+");
+                double rangeFrom = Double.parseDouble(parts[0].trim().replace(",", ""));
+                double rangeTo   = Double.parseDouble(parts[1].trim().replace(",", ""));
 
-                // Skip rows that are not valid bracket entries (empty cells, NOTE line, etc.)
-                if (salaryRange.isEmpty() || rateText.isEmpty() || !rateText.endsWith("%")) continue;
-
-                // Convert rate from percentage string to decimal: "1%" → 0.01
-                double rate = Double.parseDouble(rateText.replace("%", "").trim()) / 100.0;
-
-                // --- Parse the salary range text and check if monthlyGross falls in it ---
-
-                if (salaryRange.toLowerCase().startsWith("over")) {
-                    // Format: "Over 1,500"
-                    // Extract the floor value and check if gross exceeds it
-                    String floorText = salaryRange.substring("over".length()).trim().replace(",", "");
-                    double floor = Double.parseDouble(floorText);
-
-                    if (monthlyGross > floor) {
-                        contribution = monthlyGross * rate; // raw contribution before cap
-                        break; // stop once correct bracket is found
-                    }
-
-                } else if (salaryRange.toLowerCase().startsWith("at least")) {
-                    // Format: "At least 1,000 to 1,500"
-                    // Strip "At least" prefix, then split on " to " to get lower and upper bounds
-                    String rangeOnly = salaryRange.substring("at least".length()).trim();
-                    String[] parts = rangeOnly.split("(?i)\\s+to\\s+");
-                    double rangeFrom = Double.parseDouble(parts[0].trim().replace(",", ""));
-                    double rangeTo   = Double.parseDouble(parts[1].trim().replace(",", ""));
-
-                    if (monthlyGross >= rangeFrom && monthlyGross <= rangeTo) {
-                        contribution = monthlyGross * rate; // raw contribution before cap
-                        break; // stop once correct bracket is found
-                    }
+                if (monthlyGross >= rangeFrom && monthlyGross <= rangeTo) {
+                    contribution = monthlyGross * rate;
+                    break;
                 }
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
-        // Per government rule: Pag-IBIG employee contribution cannot exceed PHP 100.00/month.
-        // 'Math.min' returns whichever is smaller — either the computed contribution or 100.
-        return Math.min(contribution, 100); 
+        return Math.min(contribution, 100);
     }
 
 
