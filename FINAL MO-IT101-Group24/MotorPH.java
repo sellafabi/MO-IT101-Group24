@@ -27,10 +27,10 @@ public class MotorPH {
         This way, if a path or credential ever changes, it only needs to be
         updated in one place.
     -------------------------------------------------------------------------*/
-    static final String EMP_FILE         = "FINAL MO-IT101-Group24/src/details.csv";
-    static final String ATT_FILE         = "FINAL MO-IT101-Group24/src/attendance.csv";
-    static final String SSS_FILE         = "FINAL MO-IT101-Group24/src/sss.csv";
-    static final String PAGIBIG_FILE     = "FINAL MO-IT101-Group24/src/pagibig.csv";
+    static final String EMP_FILE         = "src/details.csv";
+    static final String ATT_FILE         = "src/attendance.csv";
+    static final String SSS_FILE         = "src/sss.csv";
+    static final String PAGIBIG_FILE     = "src/pagibig.csv";
     static final String EMP_USERNAME     = "employee";
     static final String PAYROLL_USERNAME = "payroll_staff";
     static final String PASSWORD         = "12345";
