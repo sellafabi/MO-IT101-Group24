@@ -137,13 +137,13 @@ public class MotorPH {
                         if(line.trim().isEmpty()) continue; // skip blank lines in the CSV file
 
                         // Split the line by comma to access individual columns
-                        String[] data = line.split(",");
+                        String[] empData = line.split(",");
 
                         // Column 0 = Employee Number; compare against what the user typed
-                        if (data[0].equals(employeeNo)){
-                            lastName = data[1]; // Column 1: Last Name
-                            firstName  = data[2]; // Column 2: First Name
-                            birthday = data[3]; // Column 3: Birthday
+                        if (empData[0].equals(employeeNo)){
+                            lastName = empData[1]; // Column 1: Last Name
+                            firstName  = empData[2]; // Column 2: First Name
+                            birthday = empData[3]; // Column 3: Birthday
                             found = true;
                             break; // stop searching once a match is found
                         }
@@ -285,10 +285,10 @@ public class MotorPH {
 
                 if (line.trim().isEmpty()) continue; // skip any blank lines in the file
 
-                String[] data = line.split(",");
-                double rangeFrom = Double.parseDouble(data[0].trim()); // column 0: lower bound of salary bracket
-                String rangeToText = data[1].trim(); // column 1: upper bound, may be "Over" for the last bracket
-                double employeeShare = Double.parseDouble(data[3].trim()); // column 3: SSS employee contribution for this bracket
+                String[] sssData = line.split(",");
+                double rangeFrom = Double.parseDouble(sssData[0].trim()); // column 0: lower bound of salary bracket
+                String rangeToText = sssData[1].trim(); // column 1: upper bound, may be "Over" for the last bracket
+                double employeeShare = Double.parseDouble(sssData[3].trim()); // column 3: SSS employee contribution for this bracket
 
                 // Keep track of the current share so we have a value to return
                 // if we reach the end of the table without an exact bracket match
@@ -361,15 +361,15 @@ public class MotorPH {
                 if (line.trim().isEmpty()) continue; // skip any blank lines in the file
 
                 // Regex split handles quoted fields that contain commas (e.g., "At least 1,000 to 1,500")
-                String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                String[] pagibigData = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
-                if (data.length < 2) continue; // skip incomplete rows (e.g., NOTE line)
+                if (pagibigData.length < 2) continue; // skip incomplete rows (e.g., NOTE line)
 
                 // Column 0: salary range text — strip surrounding quotes before parsing
-                String salaryRange = data[0].trim().replace("\"", "");
+                String salaryRange = pagibigData[0].trim().replace("\"", "");
 
                 // Column 1: employee contribution rate — e.g., "1%" or "2%"
-                String rateText = data[1].trim();
+                String rateText = pagibigData[1].trim();
 
                 // Skip rows that are not valid bracket entries (empty cells, NOTE line, etc.)
                 if (salaryRange.isEmpty() || rateText.isEmpty() || !rateText.endsWith("%")) continue;
@@ -690,12 +690,12 @@ public class MotorPH {
             // lengthOfMonth() gives the correct last day (e.g., 30 for June, 31 for July)
             int daysInMonth = YearMonth.of(2024, month).lengthOfMonth();
 
-            for (String[] data : attendanceRecords) {
+            for (String[] attData : attendanceRecords) {
 
-                if (!data[0].equals(employeeNo)) continue; // Column 0 = employee number
+                if (!attData[0].equals(employeeNo)) continue; // Column 0 = employee number
 
                 // Column 3 is the date in MM/DD/YYYY format — split to get month, day, and year
-                String[] dateParts   = data[3].split("/");
+                String[] dateParts   = attData[3].split("/");
                 int      recordMonth = Integer.parseInt(dateParts[0]);
                 int      day         = Integer.parseInt(dateParts[1]);
                 int      year        = Integer.parseInt(dateParts[2]);
@@ -703,8 +703,8 @@ public class MotorPH {
                 if (year != 2024 || recordMonth != month) continue;
 
                 // Column 4 = login time, Column 5 = logout time — both in H:mm format
-                LocalTime login  = LocalTime.parse(data[4].trim(), timeFormat);
-                LocalTime logout = LocalTime.parse(data[5].trim(), timeFormat);
+                LocalTime login  = LocalTime.parse(attData[4].trim(), timeFormat);
+                LocalTime logout = LocalTime.parse(attData[5].trim(), timeFormat);
 
                 double hours = computeHoursWorked(login, logout);
 
@@ -807,15 +807,15 @@ public class MotorPH {
                 if (line.trim().isEmpty()) continue;
 
                 // Regex split handles commas inside quoted fields (e.g., addresses)
-                String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                String[] empData = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
                 // Column 0 = Employee Number — compare against the input
-                if (data[0].equals(employeeNo)) {
-                    employeeNo = data[0];                             // Column 0: Employee Number
-                    lastName   = data[1];                             // Column 1: Last Name
-                    firstName  = data[2];                             // Column 2: First Name
-                    birthday   = data[3];                             // Column 3: Birthday
-                    rate       = Double.parseDouble(data[18].trim()); // Column 18: Hourly Rate
+                if (empData[0].equals(employeeNo)) {
+                    employeeNo = empData[0];                             // Column 0: Employee Number
+                    lastName   = empData[1];                             // Column 1: Last Name
+                    firstName  = empData[2];                             // Column 2: First Name
+                    birthday   = empData[3];                             // Column 3: Birthday
+                    rate       = Double.parseDouble(empData[18].trim()); // Column 18: Hourly Rate
                     found      = true;
                     break;
                 }
@@ -886,8 +886,8 @@ public class MotorPH {
 
             while ((line = br.readLine()) != null) {
                 // Regex split handles commas inside quoted fields (e.g., addresses)
-                String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
-                employees.add(data);
+                String[] empData = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                employees.add(empData);
             }
 
         } catch (IOException e) {
@@ -910,12 +910,12 @@ public class MotorPH {
         }
 
         // Step 3: Process each employee using the pre-loaded attendance list
-        for (String[] employeeData : employees) {
-            String    employeeNo   = employeeData[0];                             // Column 0: Employee Number
-            String    lastName     = employeeData[1];                             // Column 1: Last Name
-            String    firstName    = employeeData[2];                             // Column 2: First Name
-            String    birthday     = employeeData[3];                             // Column 3: Birthday
-            double    rate         = Double.parseDouble(employeeData[18].trim()); // Column 18: Hourly Rate
+        for (String[] empData : employees) {
+            String    employeeNo   = empData[0];                             // Column 0: Employee Number
+            String    lastName     = empData[1];                             // Column 1: Last Name
+            String    firstName    = empData[2];                             // Column 2: First Name
+            String    birthday     = empData[3];                             // Column 3: Birthday
+            double    rate         = Double.parseDouble(empData[18].trim()); // Column 18: Hourly Rate
 
             processPayroll(employeeNo, lastName, firstName, birthday, rate, attendanceRecords, timeFormat);
         }
