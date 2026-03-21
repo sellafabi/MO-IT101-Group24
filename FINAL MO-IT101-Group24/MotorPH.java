@@ -75,10 +75,12 @@ public class MotorPH {
             System.exit(0);
         }
 
+        return username;
+
     }
 
 
-    public static void printEmployeeInfo () {
+    public static void printEmployeeInfo (String employeeNo, String  lastName, String  firstName, String  birthday) {
         System.out.println("\n==================================== ");
         System.out.println( "        Employee Information");
         System.out.println("==================================== ");
@@ -98,22 +100,12 @@ public class MotorPH {
 
 
     public static void employeeMenu() {
-                /*------------------------------------------------------------------------
-            EMPLOYEE LOGIN
-            The "employee" role grants access to self-service information lookup
-            only. The employee can view their own details or exit the program.
-            They cannot access payroll processing or view other employees' data.
-        -------------------------------------------------------------------------*/
-        if (isEmployee) {
-            System.out.println("\nEmployee login successful.");
-            String option = "";
-
             // Display the employee menu after successful login
             System.out.println("\n==================================== ");
             System.out.println("\n1. View Employee Details ");
             System.out.println("2. Exit program");
             System.out.print("Choose Option: ");
-            option = sc.nextLine();
+            String option = sc.nextLine();
             System.out.println("==================================== \n");
 
             /*--------------------------------------------------------------------
@@ -189,14 +181,11 @@ public class MotorPH {
                 System.exit(0); // program terminated
             }
     }
-}
+
 
 
 
     public static void payrollMenu() {
-                
-        if (isPayrollStaff) {
-            System.out.println("\nPayroll staff Login successful!");
 
             // Display the payroll staff menu after a successful login.
             System.out.println("\n==================================== ");
@@ -246,11 +235,11 @@ public class MotorPH {
             }
 
         // If the credentials are incorrect, the system displays an error message and terminates the program.
-        } else {
+        
                 System.out.println("\nIncorrect username and/or password.\n");
                 System.exit(0);
-            }            
-} 
+    }            
+    
     
 
 
