@@ -75,7 +75,6 @@ public class MotorPH {
         -------------------------------------------------------------------------*/
         if (!isEmployee && !isPayrollStaff) {
             System.out.println("\nIncorrect username and/or password.\n");
-            sc.close();
             System.exit(0);
         }
 
@@ -172,7 +171,6 @@ public class MotorPH {
             ---------------------------------------------------------------------*/
             } else if (option.equals("2")){
                 System.out.println("\nExiting program.\n");
-                sc.close();
                 System.exit(0); // program terminated
                 
                 // Added feature - Any input other than "1" or "2" is not a valid menu option 
