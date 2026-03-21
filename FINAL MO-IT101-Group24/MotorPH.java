@@ -12,21 +12,10 @@ import java.util.Scanner;
 
 public class MotorPH {
 
-
-    /*------------------------------------------------------------------------
-        SHARED SCANNER INSTANCE
-        A single Scanner object is declared at the class level so that all
-        methods share the same input stream.
-    -------------------------------------------------------------------------*/
+    //A single Scanner is declared at the class level and shared by all methods.
     static Scanner sc = new Scanner(System.in);
 
-    /*------------------------------------------------------------------------
-        PROGRAM CONSTANTS
-        All file paths, usernames, and the password are defined here as
-        static final constants instead of being written directly inside methods.
-        This way, if a path or credential ever changes, it only needs to be
-        updated in one place.
-    -------------------------------------------------------------------------*/
+    //Program constants are defined here instead of writing directly inside the methods for accessibility purposes.
     static final String EMP_FILE         = "FINAL MO-IT101-Group24/src/details.csv";
     static final String ATT_FILE         = "FINAL MO-IT101-Group24/src/attendance.csv";
     static final String SSS_FILE         = "FINAL MO-IT101-Group24/src/sss.csv";
@@ -63,7 +52,7 @@ public class MotorPH {
     public static void main(String[] args) {
 
 
-        // Prompt the user to enter their credentials
+        // Prompts the user to enter their credentials
         System.out.println("\n==================================== ");
         System.out.println("        MotorPH Login System         ");
         System.out.println("==================================== ");
@@ -74,34 +63,21 @@ public class MotorPH {
         String inputPassword = sc.nextLine();
 
         // Evaluate both username and password together in a single check per role.
-        // Using && ensures that both fields must be correct — if only one is wrong,
-        // neither flag will be true, and the invalid credentials block below will trigger.
         boolean isEmployee     = username.equals(EMP_USERNAME)     && inputPassword.equals(PASSWORD);
         boolean isPayrollStaff = username.equals(PAYROLL_USERNAME) && inputPassword.equals(PASSWORD);
 
-        /*------------------------------------------------------------------------
-            INVALID CREDENTIALS
-            If neither flag is true, it means the username, the password, or
-            both are incorrect. Per process flow, the program must display an
-            error message and terminate immediately — no retry is allowed.
-        -------------------------------------------------------------------------*/
+        // If neither flag true, the program shall display an error message and terminate immediately.
         if (!isEmployee && !isPayrollStaff) {
             System.out.println("\nIncorrect username and/or password.\n");
             sc.close();
             System.exit(0);
         }
 
-        /*------------------------------------------------------------------------
-            EMPLOYEE LOGIN
-            The "employee" role grants access to self-service information lookup
-            only. The employee can view their own details or exit the program.
-            They cannot access payroll processing or view other employees' data.
-        -------------------------------------------------------------------------*/
-        if (isEmployee) {
+        if (isEmployee) { // Employee login block
             System.out.println("\nEmployee login successful.");
             String option = "";
 
-            // Display the employee menu after successful login
+            // Displays the employee menu after a successful login.
             System.out.println("\n==================================== ");
             System.out.println("\n1. View Employee Details ");
             System.out.println("2. Exit program");
@@ -109,29 +85,21 @@ public class MotorPH {
             option = sc.nextLine();
             System.out.println("==================================== \n");
 
-            /*--------------------------------------------------------------------
-                Option 1 — View Employee Details
-                The employee enters their employee number. The program searches
-                the employee CSV file line by line until it finds a row whose
-                first column (employee number) matches the input.
-                If found, display employee's number, name, and birthday.
-                If not found, display "Employee number does not exist."
-            ---------------------------------------------------------------------*/
+            // Option 1: Asks the user for a valid employee number and displays the employee details if found.
             if (option.equals("1")){
                 System.out.print("Enter Your Employee Number: ");
 
-                // These variables will hold the matched employee's data from CSV file once found
+                // These variables will hold the matched employee's data from CSV file once found.
                 String employeeNo = sc.nextLine(); 
                 String  lastName  = "";
                 String  firstName = "";
                 String  birthday  = "";
                 boolean found     = false;
                                 
-                // Open the employee CSV file and search for a row whose first column
-                // matches the employee number entered by the user
+                // Opens the employee CSV file and search for a row whose first column matches the employee number entered by the user
                 try (BufferedReader br = new BufferedReader (new FileReader (EMP_FILE))){
 
-                    br.readLine(); // skip header row
+                    br.readLine(); // skips header row
                     String line;
 
                     while ((line = br.readLine()) !=null){
@@ -140,23 +108,20 @@ public class MotorPH {
                         // Split the line by comma to access individual columns
                         String[] data = line.split(",");
 
-                        // Column 0 = Employee Number; compare against what the user typed
+                        //Column 0: Employee Number to be compared with what the user typed.
                         if (data[0].equals(employeeNo)){
                             lastName = data[1]; // Column 1: Last Name
                             firstName  = data[2]; // Column 2: First Name
                             birthday = data[3]; // Column 3: Birthday
                             found = true;
-                            break; // stop searching once a match is found
+                            break; // stops searching once a match is found
                         }
                     }
 
                 } catch (IOException e) {
-                    System.out.println("\nEmployee file error.\n");
+                    System.out.println("\nEmployee file error.\n"); // If something goes wrong with the file, the program will print this instead of crashing.
                 }
                 
-
-
-                // Per process flow: display employee's number, name, and birthday if found
                 if (found){
                     System.out.println("\n==================================== ");
                     System.out.println( "        Employee Information");
@@ -166,115 +131,78 @@ public class MotorPH {
                     System.out.println("Employee Birthday: " + birthday);
                     System.out.println("====================================\n");
                     
-                    // Per process flow: if no matching record was found, display this message
-                } else {
-                    System.out.println("\nEmployee number does not exist.\n");
-                }
+                    } else {
+                        System.out.println("\nEmployee number does not exist.\n"); // If no record match was found, the program shall display this message instead of crashing.
+                    }
                 
-            /*--------------------------------------------------------------------
-                Option 2: Exit the program
-                If the employee chose to exit. Close the scanner to release the
-                input stream resource before terminating the program.
-            ---------------------------------------------------------------------*/
+                // Option 2: Closes the scanner and terminates the program.
             } else if (option.equals("2")){
                 System.out.println("\nExiting program.\n");
                 sc.close();
-                System.exit(0); // program terminated
-                
-                // Added feature - Any input other than "1" or "2" is not a valid menu option 
-            } else {
-                System.out.println("\nInvalid option. Please enter 1 or 2.\n");
-                sc.close();
-                System.exit(0); // program terminated
-            }
-  
-        /*------------------------------------------------------------------------
-            PAYROLL STAFF LOGIN
-            The "payroll_staff" role grants access to payroll processing.
-            Staff can compute and view payroll records for one specific employee
-            or for all employees at once, covering June to December 2024.
-        -------------------------------------------------------------------------*/
-        }else { 
+                System.exit(0);
 
-            System.out.println("\nPayroll staff Login successful!");;
-
-            // Display the payroll staff menu after successful login
-            System.out.println("\n==================================== ");
-            System.out.println("\n1. Process Payroll");
-            System.out.println("2. Exit program");
-            System.out.print("Choose Option: ");
-            String option = sc.nextLine();
-            System.out.println("\n====================================");
-            
-            /*--------------------------------------------------------------------
-                Option 1: Process Payroll
-                Allowances are NOT included in gross salary computation, per the
-                process flow requirement. The payroll staff is then shown a
-                sub-menu to choose between one employee or all employees.
-            ---------------------------------------------------------------------*/
-            if (option.equals("1")) {
-                System.out.println("\n1. View One Employee");
-                System.out.println("2. View All Employees");
-                System.out.println("3. Exit program");
-                System.out.print("Choose Sub-option: ");
-                String subOption = sc.nextLine();
-                
-                                
-                /*----------------------------------------------------------------
-                    Sub-option 1: One Employee
-                    The payroll staff enters a specific employee number.
-                    The program searches for that employee and, if found,
-                    delegates the full payroll computation and display to
-                    the oneEmployee() method, which covers June to December.
-                      Per cutoff:
-                        First Cutoff  (1–15):  Total Hours Worked, Gross, Net Salary
-                        Second Cutoff (16–30): Total Hours Worked, Gross, 
-                                               Each Deduction (SSS, PhilHealth, Pag-IBIG, Tax), 
-                                               Total Deductions, Net Salary
-                -----------------------------------------------------------------*/
-                if (subOption.equals("1")){
-                System.out.print("\nEnter Employee Number: ");
-                String employeeNo = sc.nextLine();
-                System.out.println("\n====================================\n");
-                oneEmployee(employeeNo); // standardized name: employeeNo
-
-                /*------------------------------------------------------------
-                    Sub-option 2: All Employees
-                    Delegates to allEmployee(), which processes every employee
-                    in the CSV file using the same display format as Sub-option 1.
-                -------------------------------------------------------------*/
-                } else if (subOption.equals("2")){
-                    allEmployee(); // delegate payroll processing to allEmployee()
-
-                /*------------------------------------------------------------
-                    Sub-option 3: Exit the program
-                -------------------------------------------------------------*/
-                } else if (subOption.equals("3")){
-                    System.out.println("\nExiting program.\n");
-                    sc.close();
-                    System.exit(0);
-
-                // Added feature - Any input other than "1", "2", or "3" is not valid 
+                // Added feature: Any input other than "1" or "2" is not a valid menu option. 
                 } else {
-                    System.out.println("\nInvalid option. Please enter 1, 2, or 3.\n");
+                    System.out.println("\nInvalid option. Please enter 1 or 2.\n");
+                    sc.close();
+                    System.exit(0);
                 }
+  
+            } else { // Payroll staff login block.
 
-            /*--------------------------------------------------------------------
-                Option 2 — Exit
-            ---------------------------------------------------------------------*/
-            } else if (option.equals("2")) {
+                System.out.println("\nPayroll staff Login successful!");;
+
+                // Display the payroll staff menu after a successful login.
+                System.out.println("\n==================================== ");
+                System.out.println("\n1. Process Payroll");
+                System.out.println("2. Exit program");
+                System.out.print("Choose Option: ");
+                String option = sc.nextLine();
+                System.out.println("\n====================================");
+                
+                // Option 1: Grants user an access to process the payroll of a single or all employees, and a choice to terminate the program.
+                if (option.equals("1")) {
+                    System.out.println("\n1. View One Employee");
+                    System.out.println("2. View All Employees");
+                    System.out.println("3. Exit program");
+                    System.out.print("Choose Sub-option: ");
+                    String subOption = sc.nextLine();
+                    
+                    // Sub-option 1: Asks the user for a valid employee number and displays the full payroll computation processed in oneEmployee() method.
+                    if (subOption.equals("1")){
+                        System.out.print("\nEnter Employee Number: ");
+                        String employeeNo = sc.nextLine();
+                        System.out.println("\n====================================\n");
+                        oneEmployee(employeeNo); // standardized name: employeeNo
+
+                    // Sub-option 2: Displays the full payroll computation of all employees processed in allEmployee() method.
+                    } else if (subOption.equals("2")){
+                        allEmployee(); // delegate payroll processing to allEmployee()
+
+                    // Sub-option 3: Exits the program
+                    } else if (subOption.equals("3")){
+                        System.out.println("\nExiting program.\n");
+                        sc.close();
+                        System.exit(0);
+
+                    // Added feature: Any input other than "1", "2", or "3" is not valid 
+                    } else {
+                        System.out.println("\nInvalid option. Please enter 1, 2, or 3.\n");
+                    }
+
+                // Option 2: Exits the program.
+                } else if (option.equals("2")) {
                     System.out.println("\nExiting program.\n");
                     sc.close();
                     System.exit(0);
 
-            // Added feature - Invalid option — only 1 or 2 are accepted 
-            } else {
-                System.out.println("\nInvalid option. Please enter 1 or 2.\n");
-            }
+                // Added feature - Invalid option — only 1 or 2 are accepted 
+                } else {
+                    System.out.println("\nInvalid option. Please enter 1 or 2.\n");
+                }
+            } 
+            sc.close();
         } 
-        sc.close();
-    } 
-
 
 
     /*========================================================================================
@@ -312,7 +240,7 @@ public class MotorPH {
 
         try (BufferedReader br = new BufferedReader(new FileReader(SSS_FILE))) {
 
-            br.readLine(); // skip header row of the SSS table
+            br.readLine();
             String line;
 
             while ((line = br.readLine()) != null) {
@@ -324,12 +252,10 @@ public class MotorPH {
                 String rangeToText = data[1].trim(); // column 1: upper bound, may be "Over" for the last bracket
                 double employeeShare = Double.parseDouble(data[3].trim()); // column 3: SSS employee contribution for this bracket
 
-                // Keep track of the current share so we have a value to return
-                // if we reach the end of the table without an exact bracket match
+                // Keep track of the current share so we have a value to return if we reach the end of the table without an exact bracket match.
                 lastEmployeeShare = employeeShare;
 
-                // "Over" means there is no upper limit — any salary at or above
-                // rangeFrom qualifies for this maximum bracket
+                // "Over" means there is no upper limit — any salary at or above rangeFrom qualifies for this maximum bracket.
                 if (rangeToText.equalsIgnoreCase("Over")) {
                     if (monthlyGross >= rangeFrom) {
                         return employeeShare;
@@ -338,7 +264,6 @@ public class MotorPH {
                 } else {
                     double rangeTo = Double.parseDouble(rangeToText);
 
-                    // Check if the monthly gross falls within this SSS salary bracket
                     if (monthlyGross >= rangeFrom && monthlyGross <= rangeTo) {
                         return employeeShare; // return the matched contribution amount
                     }
@@ -349,11 +274,9 @@ public class MotorPH {
             e.printStackTrace();
         }
 
-        // Return the last bracket's share as a fallback if no range matched
-        return lastEmployeeShare;
+        return lastEmployeeShare; // Return the last bracket's share as a fallback if no range matched.
         
     }
-
 
 
     /*========================================================================================
@@ -387,7 +310,7 @@ public class MotorPH {
 
         try (BufferedReader br = new BufferedReader(new FileReader(PAGIBIG_FILE))) {
 
-            br.readLine(); // skip header row of the Pag-IBIG table
+            br.readLine();
             String line;
 
             while ((line = br.readLine()) != null) {
@@ -425,8 +348,7 @@ public class MotorPH {
                     }
 
                 } else if (salaryRange.toLowerCase().startsWith("at least")) {
-                    // Format: "At least 1,000 to 1,500"
-                    // Strip "At least" prefix, then split on " to " to get lower and upper bounds
+                    // Strips "At least" prefix, then split on " to " to get lower and upper bounds
                     String rangeOnly = salaryRange.substring("at least".length()).trim();
                     String[] parts = rangeOnly.split("(?i)\\s+to\\s+");
                     double rangeFrom = Double.parseDouble(parts[0].trim().replace(",", ""));
@@ -443,11 +365,8 @@ public class MotorPH {
             e.printStackTrace();
         }
 
-        // Per government rule: Pag-IBIG employee contribution cannot exceed PHP 100.00/month.
-        // 'Math.min' returns whichever is smaller — either the computed contribution or 100.
-        return Math.min(contribution, 100); 
+        return Math.min(contribution, 100); // returns whichever is smaller — either the computed contribution or 100.
     }
-
 
 
     /* =======================================================================================
@@ -480,30 +399,19 @@ public class MotorPH {
         // philhealthDeduction holds the result to be returned.
         double philhealthDeduction = 0.0;
 
-        // Apply the correct PhilHealth bracket based on the employee's monthly gross salary
+        // Apply the correct PhilHealth bracket based on the employee's monthly gross salary and divide in half to compute the employee share.
         if (monthlyGross <= 10000) {
-
-            // Bracket 1: salaries at or below 10,000 pay a flat premium of 300;
-            // employee pays half = 150
             philhealthDeduction = 300/2;
 
         } else if (monthlyGross > 10000 && monthlyGross < 60000){
-
-            // Bracket 2: salaries between 10,001 and 59,999 are charged 3% of gross;
-            // employee pays half of that = 1.5% of gross
             philhealthDeduction =  monthlyGross*(0.03)/2;
 
         } else if (monthlyGross >= 60000) {
-
-            // Bracket 3: salaries at or above 60,000 hit the ceiling premium of 1,800;
-            // employee pays half = 900 (contribution does not increase beyond this)
-            philhealthDeduction = 1800/2;
+            philhealthDeduction = 1800/2; // over 60,000 gross salary has a fixed rate of 1800; employee pays half of it, hence the ' /2'.
             }
 
-        // Returns the computed employee share of PhilHealth contribution
-        return philhealthDeduction; 
+        return philhealthDeduction; // Returns the computed employee share of PhilHealth contribution
     }
-
 
 
     /* =======================================================================================
@@ -514,10 +422,9 @@ public class MotorPH {
         * Computes the monthly withholding tax of an employee using the BIR tax table.
         *
         * Algorithm:
-        * The BIR (Bureau of Internal Revenue) withholding tax is NOT computed on the
-        * gross salary directly. The taxable salary must first be derived by subtracting
-        * all government contributions (SSS + PhilHealth + Pag-IBIG) from the monthly
-        * gross. Only the resulting taxable salary is matched against the six BIR brackets:
+        * The BIR withholding tax is computed after deducting all of the mandatory 
+        * government contributions to the monthly gross salary.
+        * Only the resulting taxable salary is matched against the six BIR brackets:
         *
         * Bracket 1: taxable ≤ 20,832 Tax = 0.00 (exempted from tax)
         * Bracket 2: 20,833 – 33,332 Tax = (taxable − 20,833) × 20%
@@ -539,46 +446,29 @@ public class MotorPH {
 
     public static double withholdingTax (double totalGross, double totalContribution) {
         double tax = 0.00;
-
-        // Taxable salary = monthly gross minus all mandatory government contributions.
-        // This step follows the BIR rule that contributions are pre-tax deductions —
-        // the employee is only taxed on what remains after contributions are removed.
         double taxableMonthlySalary = totalGross - totalContribution; 
         
         // Apply the BIR tax bracket that matches the computed taxable salary
         if (taxableMonthlySalary <= 20832) {
-
-            // Bracket 1: fully exempt — no withholding tax
             tax = 0.00;
 
         } else if (taxableMonthlySalary >= 20833 && taxableMonthlySalary < 33333) {
-
-            // Bracket 2: 20% applied only to the amount exceeding the floor of 20,833
             tax = (taxableMonthlySalary-20833)*0.2;
 
         } else if (taxableMonthlySalary >= 33333 && taxableMonthlySalary < 66667) {
-
-            // Bracket 3: fixed base of 2,500 plus 25% on the excess over 33,333
-            tax = 2500+(taxableMonthlySalary-33333)*0.25; // 2,500 + 25% on the excess over 33,333
+            tax = 2500+(taxableMonthlySalary-33333)*0.25;
 
         } else if (taxableMonthlySalary >= 66667 && taxableMonthlySalary < 166667) {
-
-            // Bracket 4: fixed base of 10,833 plus 30% on the excess over 66,667
             tax = 10833+(taxableMonthlySalary-66667)*0.30;
 
         } else if (taxableMonthlySalary >= 166667 && taxableMonthlySalary < 666667) {
-
-            // Bracket 5: fixed base of 40,833.33 plus 32% on the excess over 166,667
             tax = 40833.33+(taxableMonthlySalary-166667)*0.32;
 
         } else if (taxableMonthlySalary >= 666667) {
-
-            // Bracket 6: fixed base of 200,833.33 plus 35% on the excess over 666,667
             tax = 200833.33+(taxableMonthlySalary-666667)*0.35;
         }
 
-        // Returns the final computed withholding tax amount
-        return tax;
+        return tax; // Returns the final computed withholding tax amount
     }  
 
 
