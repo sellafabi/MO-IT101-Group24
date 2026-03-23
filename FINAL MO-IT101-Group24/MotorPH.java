@@ -83,6 +83,7 @@ public class MotorPH {
         // Get user input
         System.out.print("\nEnter Username: ");
         String username = sc.nextLine();
+
         System.out.print("Enter Password: ");
         String inputPassword = sc.nextLine();
 
@@ -95,8 +96,7 @@ public class MotorPH {
             System.out.println("\nIncorrect username and/or password.\n");
             System.exit(0);
         }
-
-        return username;
+    return username;
     }
 
 
@@ -151,9 +151,10 @@ public class MotorPH {
          * 5. Displays an error message for invalid input.
          */
     public static void employeeMenu() {
+
         // Display menu options
         System.out.println("\n--------------------------------------");
-        System.out.println("\n1. View Employee Details ");
+        System.out.println("\n1. Enter you employee number");
         System.out.println("2. Exit program");
         System.out.print("Choose Option: ");
         String option = sc.nextLine();
@@ -357,7 +358,6 @@ public class MotorPH {
 
         // Stores last valid employee share as fallback
         double lastEmployeeShare = 0;
-
         for (String[] sssRow : sssTable) {
 
             // SSS Table Columns:
@@ -373,16 +373,13 @@ public class MotorPH {
                 if (monthlyGross >= rangeFrom) return employeeShare;
             } else {
                 double rangeTo = Double.parseDouble(rangeToText);
-
                 // Check if salary falls within range
                 if (monthlyGross >= rangeFrom && monthlyGross <= rangeTo) {
-                    
                     return employeeShare;
                 }
             }
         }
-
-        return lastEmployeeShare; 
+    return lastEmployeeShare; 
     }
 
 
@@ -430,7 +427,6 @@ public class MotorPH {
                     contribution = monthlyGross * rate;
                     break;
                 }
-
             // Handle ranged values (e.g., "At least X to Y")
             } else if (salaryRange.toLowerCase().startsWith("at least")) {
 
@@ -446,9 +442,8 @@ public class MotorPH {
                 }
             }
         }
-
-        // Apply maximum contribution cap (PHP 100.00)
-        return Math.min(contribution, 100);
+    // Apply maximum contribution cap (PHP 100.00)
+    return Math.min(contribution, 100);
     }
 
 
@@ -475,20 +470,19 @@ public class MotorPH {
         if (monthlyGross <= 10000) {
 
             // Fixed contribution for lowest bracket
-            philhealthDeduction = 300/2;
+            philhealthDeduction = 300 / 2;
 
-        } else if (monthlyGross > 10000 && monthlyGross < 60000){
+        } else if (monthlyGross > 10000 && monthlyGross < 60000) {
 
             // 1.5% of monthly gross (half of 3% total rate)
-            philhealthDeduction =  monthlyGross*(0.03)/2;
+            philhealthDeduction =  monthlyGross*(0.03) / 2;
 
         } else if (monthlyGross >= 60000) {
 
             // Maximum contribution cap
-            philhealthDeduction = 1800/2;
+            philhealthDeduction = 1800 / 2;
         }
-
-        return philhealthDeduction; 
+    return philhealthDeduction; 
     }
 
 
@@ -547,8 +541,8 @@ public class MotorPH {
         } else if (taxableMonthlySalary >= 666667) {
             tax = 200833.33+(taxableMonthlySalary-666667)*0.35; // Bracket 6: fixed base of 200,833.33 plus 35% on the excess over 666,667
         }
-
-        return tax; // Returns the final computed withholding tax amount
+    // Returns the final computed withholding tax amount
+    return tax;
     }  
 
 
@@ -588,6 +582,7 @@ public class MotorPH {
         
         final LocalTime GRACE_PERIOD   = LocalTime.of(8, 10); // grace period ends at 8:10 AM (inclusive)
         final LocalTime STANDARD_START = LocalTime.of(8,  0); // official workday start
+        
         final LocalTime CUTOFF_TIME    = LocalTime.of(17, 0); // official workday end
         final int       LUNCH_BREAK    = 60;                  // unpaid break in minutes
 
@@ -615,8 +610,8 @@ public class MotorPH {
         } else {
             minutesWorked = 0;
         }
-
-        return minutesWorked / 60.0; // Convert minutes to hours     
+    // Convert minutes to hours
+    return minutesWorked / 60.0;      
     }
 
 
