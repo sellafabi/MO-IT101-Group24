@@ -444,10 +444,9 @@ public class MotorPH {
         * Computes the monthly withholding tax of an employee using the BIR tax table.
         *
         * Algorithm:
-        * The BIR (Bureau of Internal Revenue) withholding tax is NOT computed on the
-        * gross salary directly. The taxable salary must first be derived by subtracting
-        * all government contributions (SSS + PhilHealth + Pag-IBIG) from the monthly
-        * gross. Only the resulting taxable salary is matched against the six BIR brackets:
+        * The BIR (Bureau of Internal Revenue) withholding tax is computed after deducting all of the 
+        * mandated government contributions (SSS + PhilHealth + Pag-IBIG) from the monthly gross salary.
+        * Only the resulting taxable salary is matched against the six BIR brackets:
         *
         * Bracket 1: taxable ≤ 20,832 Tax = 0.00 (exempted from tax)
         * Bracket 2: 20,833 – 33,332 Tax = (taxable − 20,833) × 20%
@@ -470,45 +469,30 @@ public class MotorPH {
     public static double withholdingTax (double totalGross, double totalContribution) {
         double tax = 0.00;
 
-        // Taxable salary = monthly gross minus all mandatory government contributions.
-        // This step follows the BIR rule that contributions are pre-tax deductions —
-        // the employee is only taxed on what remains after contributions are removed.
+        // Withholding tax is applied after deducting the mandatory contributions to the monthly gross, leaving only the taxable salary.
         double taxableMonthlySalary = totalGross - totalContribution; 
         
         // Apply the BIR tax bracket that matches the computed taxable salary
         if (taxableMonthlySalary <= 20832) {
-
-            // Bracket 1: fully exempt — no withholding tax
-            tax = 0.00;
+            tax = 0.00;  // Bracket 1: fully exempt — no withholding tax
 
         } else if (taxableMonthlySalary >= 20833 && taxableMonthlySalary < 33333) {
-
-            // Bracket 2: 20% applied only to the amount exceeding the floor of 20,833
-            tax = (taxableMonthlySalary-20833)*0.2;
+            tax = (taxableMonthlySalary-20833)*0.2;  // Bracket 2: 20% applied only to the amount exceeding the floor of 20,833
 
         } else if (taxableMonthlySalary >= 33333 && taxableMonthlySalary < 66667) {
-
-            // Bracket 3: fixed base of 2,500 plus 25% on the excess over 33,333
-            tax = 2500+(taxableMonthlySalary-33333)*0.25; // 2,500 + 25% on the excess over 33,333
+            tax = 2500+(taxableMonthlySalary-33333)*0.25; // Bracket 3: fixed base of 2,500 plus 25% on the excess over 33,333
 
         } else if (taxableMonthlySalary >= 66667 && taxableMonthlySalary < 166667) {
-
-            // Bracket 4: fixed base of 10,833 plus 30% on the excess over 66,667
-            tax = 10833+(taxableMonthlySalary-66667)*0.30;
+            tax = 10833+(taxableMonthlySalary-66667)*0.30; // Bracket 4: fixed base of 10,833 plus 30% on the excess over 66,667
 
         } else if (taxableMonthlySalary >= 166667 && taxableMonthlySalary < 666667) {
-
-            // Bracket 5: fixed base of 40,833.33 plus 32% on the excess over 166,667
-            tax = 40833.33+(taxableMonthlySalary-166667)*0.32;
+            tax = 40833.33+(taxableMonthlySalary-166667)*0.32; // Bracket 5: fixed base of 40,833.33 plus 32% on the excess over 166,667
 
         } else if (taxableMonthlySalary >= 666667) {
-
-            // Bracket 6: fixed base of 200,833.33 plus 35% on the excess over 666,667
-            tax = 200833.33+(taxableMonthlySalary-666667)*0.35;
+            tax = 200833.33+(taxableMonthlySalary-666667)*0.35; // Bracket 6: fixed base of 200,833.33 plus 35% on the excess over 666,667
         }
 
-        // Returns the final computed withholding tax amount
-        return tax;
+        return tax; // Returns the final computed withholding tax amount
     }  
 
 
@@ -566,6 +550,7 @@ public class MotorPH {
             logIn = STANDARD_START;
         }
 
+        // Calculate total minutes worked between login and logout times
         long minutesWorked = Duration.between(logIn, logOut).toMinutes();
 
         // Rule 3: Subtract the mandatory lunch break; if 60 min or less was logged, result is 0
@@ -575,7 +560,7 @@ public class MotorPH {
             minutesWorked = 0;
         }
 
-        return minutesWorked / 60.0;            
+        return minutesWorked / 60.0; // Convert minutes to hours     
     }
 
 
@@ -645,7 +630,7 @@ public class MotorPH {
         System.out.println("Birthday : "      + birthday);
         System.out.println("===================================\n");
 
-        // June (6) to December (12) per process flow requirement
+        // includes months from: June (6) to December (12) per process flow requirement
         for (int month = 6; month <= 12; month++) {
 
             double firstHalf  = 0; // hours worked days 1–15
@@ -656,7 +641,7 @@ public class MotorPH {
 
             for (String[] attData : attendanceRecords) {
 
-                if (!attData[0].equals(employeeNo)) continue; // Column 0 = employee number
+                if (!attData[0].equals(employeeNo)) continue; // Column 0 contains the employee number
 
                 // Column 3 is the date in MM/DD/YYYY format — split to get month, day, and year
                 String[] dateParts   = attData[3].split("/");
@@ -673,9 +658,10 @@ public class MotorPH {
                 double hours = computeHoursWorked(login, logout);
 
                 if (day <= 15) firstHalf  += hours; // days 1–15:   first cutoff
-                else           secondHalf += hours; // days 16–end: second cutoff
+                else           secondHalf += hours; // days 16–end of the month: second cutoff
             }
 
+            // Compute gross salary for the first and second cut-off.
             double grossFirst  = computeGross(firstHalf,  rate);
             double grossSecond = computeGross(secondHalf, rate);
 
@@ -693,6 +679,7 @@ public class MotorPH {
             // Deductions are applied on the second cutoff payout only, per process flow.
             double netSalary = grossSecond - totalDeductions;
 
+            // Convert numeric month (6-12) to its name; otherwise, returns to the default label
             String monthName = switch (month) {
                 case 6  -> "June";
                 case 7  -> "July";
@@ -711,7 +698,7 @@ public class MotorPH {
             System.out.println("Gross Salary: "        + grossFirst);
             System.out.println("Net Salary: "          + grossFirst);
 
-            // Second cutoff — all four government deductions applied here
+            // Second cutoff — all four government deductions are applied here
             System.out.println("\nSecond Cutoff");
             System.out.println("\nCutoff Date: "       + monthName + " 16 to " + daysInMonth);
             System.out.println("Total Hours Worked : " + secondHalf);
@@ -760,11 +747,11 @@ public class MotorPH {
         String  lastName  = "";
         String  firstName = "";
         String  birthday  = "";
-        boolean found     = false;
+        boolean empFound     = false;
         double  rate      = 0;
 
         try (BufferedReader br = new BufferedReader(new FileReader(EMP_FILE))) {
-            br.readLine(); // skip header row
+            br.readLine();
             String line;
 
             while ((line = br.readLine()) != null) {
@@ -780,7 +767,7 @@ public class MotorPH {
                     firstName  = empData[2];                             // Column 2: First Name
                     birthday   = empData[3];                             // Column 3: Birthday
                     rate       = Double.parseDouble(empData[18].trim()); // Column 18: Hourly Rate
-                    found      = true;
+                    empFound      = true;
                     break;
                 }
             }
@@ -790,7 +777,7 @@ public class MotorPH {
         }
 
         // Stop here if no matching employee number was found
-        if (!found) {
+        if (!empFound) {
             System.out.println("\nEmployee number does not exist.\n");
             return;
         }
@@ -798,7 +785,7 @@ public class MotorPH {
         // Load all attendance records once — avoids reopening the file per month (June–December)
         List<String[]> attendanceRecords = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(ATT_FILE))) {
-            br.readLine(); // skip header row
+            br.readLine(); 
             String line;
 
             while ((line = br.readLine()) != null) {
@@ -811,6 +798,7 @@ public class MotorPH {
             System.out.println("Error reading attendance file.");
         }
 
+        // calls the method that computes and displays full payroll report of the employee
         processPayroll(employeeNo, lastName, firstName, birthday, rate, attendanceRecords, timeFormat);
     }
 
@@ -845,7 +833,7 @@ public class MotorPH {
 
         // Step 1: Read all employee records from details.csv
         try (BufferedReader br = new BufferedReader(new FileReader(EMP_FILE))) {
-            br.readLine(); // skip header row
+            br.readLine();
             String line;
 
             while ((line = br.readLine()) != null) {
@@ -861,7 +849,7 @@ public class MotorPH {
         // Step 2: Load attendance records once — reused for every employee in the loop below
         List<String[]> attendanceRecords = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(ATT_FILE))) {
-            br.readLine(); // skip header row
+            br.readLine();
             String line;
 
             while ((line = br.readLine()) != null) {
@@ -881,6 +869,7 @@ public class MotorPH {
             String    birthday     = empData[3];                             // Column 3: Birthday
             double    rate         = Double.parseDouble(empData[18].trim()); // Column 18: Hourly Rate
 
+            // calls the method that computes and displays full payroll report of the employees
             processPayroll(employeeNo, lastName, firstName, birthday, rate, attendanceRecords, timeFormat);
         }
     }
