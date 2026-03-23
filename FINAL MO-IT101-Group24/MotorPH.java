@@ -744,11 +744,11 @@ public class MotorPH {
         // H:mm handles both single-digit (e.g., 8:05) and double-digit hours (e.g., 17:00)
         DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
 
-        String  lastName  = "";
-        String  firstName = "";
-        String  birthday  = "";
-        boolean empFound     = false;
-        double  rate      = 0;
+        String  lastName            = "";
+        String  firstName           = "";
+        String  birthday            = "";
+        boolean isEmpDetailsFound   = false;
+        double  rate                = 0;
 
         try (BufferedReader br = new BufferedReader(new FileReader(EMP_FILE))) {
             br.readLine();
@@ -762,12 +762,12 @@ public class MotorPH {
 
                 // Column 0 = Employee Number — compare against the input
                 if (empData[0].equals(employeeNo)) {
-                    employeeNo = empData[0];                             // Column 0: Employee Number
-                    lastName   = empData[1];                             // Column 1: Last Name
-                    firstName  = empData[2];                             // Column 2: First Name
-                    birthday   = empData[3];                             // Column 3: Birthday
-                    rate       = Double.parseDouble(empData[18].trim()); // Column 18: Hourly Rate
-                    empFound      = true;
+                    employeeNo         = empData[0];                             // Column 0: Employee Number
+                    lastName           = empData[1];                             // Column 1: Last Name
+                    firstName          = empData[2];                             // Column 2: First Name
+                    birthday           = empData[3];                             // Column 3: Birthday
+                    rate               = Double.parseDouble(empData[18].trim()); // Column 18: Hourly Rate
+                    isEmpDetailsFound  = true;
                     break;
                 }
             }
@@ -777,7 +777,7 @@ public class MotorPH {
         }
 
         // Stop here if no matching employee number was found
-        if (!empFound) {
+        if (!isEmpDetailsFound) {
             System.out.println("\nEmployee number does not exist.\n");
             return;
         }
