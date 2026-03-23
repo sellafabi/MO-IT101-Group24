@@ -175,13 +175,13 @@ public class MotorPH {
             try (BufferedReader br = new BufferedReader (new FileReader (EMP_FILE))){
 
                 br.readLine(); // skip header row
-                String line;
+                String employeeLine;
 
-                while ((line = br.readLine()) !=null){
-                    if(line.trim().isEmpty()) continue; // skip blank lines in the CSV file
+                while ((employeeLine = br.readLine()) !=null){
+                    if(employeeLine.trim().isEmpty()) continue; // skip blank lines in the CSV file
 
                     // Split CSV row while handling quoted values
-                    String[] employeeRow = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                    String[] employeeRow = employeeLine.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
                     // Column mapping:
                     // [0] Employee Number | [1] Last Name | [2] First Name | [3] Birthday
@@ -304,13 +304,13 @@ public class MotorPH {
         try (BufferedReader br = new BufferedReader(new FileReader(SSS_FILE))) {
 
             br.readLine(); // Skip header row
-            String line;
+            String sssLine;
 
-            while ((line = br.readLine()) != null) {
-                if (!line.trim().isEmpty()) { // Skip blank lines
+            while ((sssLine = br.readLine()) != null) {
+                if (!sssLine.trim().isEmpty()) { // Skip blank lines
 
                     // Split CSV row while handling quoted values
-                    sssTable.add(line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"));
+                    sssTable.add(sssLine.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"));
                 }
             }
 
@@ -322,13 +322,13 @@ public class MotorPH {
         try (BufferedReader br = new BufferedReader(new FileReader(PAGIBIG_FILE))) {
 
             br.readLine(); // Skip header row
-            String line;
+            String pagibigLine;
 
-            while ((line = br.readLine()) != null) {
-                if (!line.trim().isEmpty()) { // Skip blank lines
+            while ((pagibigLine = br.readLine()) != null) {
+                if (!pagibigLine.trim().isEmpty()) { // Skip blank lines
 
                     // Split CSV row while handling quoted values
-                    pagibigTable.add(line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"));
+                    pagibigTable.add(pagibigLine.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"));
                 }
             }
             
@@ -843,12 +843,12 @@ public class MotorPH {
         List<String[]> attendanceRecords = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(ATT_FILE))) {
             br.readLine(); 
-            String line;
+            String employeeLine;
 
-            while ((line = br.readLine()) != null) {
-                if (!line.trim().isEmpty())
+            while ((employeeLine = br.readLine()) != null) {
+                if (!employeeLine.trim().isEmpty())
                     // Same regex split — attendance fields may also contain commas inside quotes
-                    attendanceRecords.add(line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"));
+                    attendanceRecords.add(employeeLine.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"));
             }
 
         } catch (IOException e) {
@@ -891,11 +891,11 @@ public class MotorPH {
         // Step 1: Read all employee records from details.csv
         try (BufferedReader br = new BufferedReader(new FileReader(EMP_FILE))) {
             br.readLine();
-            String line;
+            String employeeLine;
 
-            while ((line = br.readLine()) != null) {
+            while ((employeeLine = br.readLine()) != null) {
                 // Regex split handles commas inside quoted fields (e.g., addresses)
-                String[] empData = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                String[] empData = employeeLine.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
                 employees.add(empData);
             }
 
@@ -907,11 +907,11 @@ public class MotorPH {
         List<String[]> attendanceRecords = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(ATT_FILE))) {
             br.readLine();
-            String line;
+            String attendanceLine;
 
-            while ((line = br.readLine()) != null) {
-                if (!line.trim().isEmpty())
-                    attendanceRecords.add(line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"));
+            while ((attendanceLine = br.readLine()) != null) {
+                if (!attendanceLine.trim().isEmpty())
+                    attendanceRecords.add(attendanceLine.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"));
             }
 
         } catch (IOException e) {
