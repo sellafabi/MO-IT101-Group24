@@ -76,9 +76,9 @@ public class MotorPH {
          */
     public static String handleLogin() {
         // Display login interface
-        System.out.println("\n==================================== ");
+        System.out.println("\n======================================");
         System.out.println("        MotorPH Login System         ");
-        System.out.println("==================================== ");
+        System.out.println("======================================");
 
         // Get user input
         System.out.print("\nEnter Username: ");
@@ -119,9 +119,9 @@ public class MotorPH {
          */
     public static void printEmployeeInfo(String employeeNo, String lastName, String firstName, String birthday) {
         // Display employee information header
-        System.out.println("\n==================================== ");
+        System.out.println("\n======================================");
         System.out.println( "        Employee Information");
-        System.out.println("==================================== ");
+        System.out.println("======================================");
 
         // Output employee details
         System.out.println("\nEmployee #: " + employeeNo);
@@ -129,7 +129,7 @@ public class MotorPH {
         System.out.println("Employee Birthday: " + birthday);
 
         // Closing separator
-        System.out.println("====================================\n");
+        System.out.println("======================================\n");
     }
 
 
@@ -152,17 +152,16 @@ public class MotorPH {
          */
     public static void employeeMenu() {
         // Display menu options
-        System.out.println("\n==================================== ");
+        System.out.println("\n--------------------------------------");
         System.out.println("\n1. View Employee Details ");
         System.out.println("2. Exit program");
         System.out.print("Choose Option: ");
         String option = sc.nextLine();
-        System.out.println("==================================== \n");
 
         // Option 1: View Employee Details
         if (option.equals("1")){
 
-            System.out.print("Enter Your Employee Number: ");
+            System.out.print("\nEnter Your Employee Number: ");
             String employeeNo         = sc.nextLine();
                 
             // Variables to store employee data once found
@@ -236,12 +235,12 @@ public class MotorPH {
     public static void payrollMenu() {
 
         // Display main payroll menu
-        System.out.println("\n==================================== ");
+        System.out.println("\n--------------------------------------");
         System.out.println("\n1. Process Payroll");
         System.out.println("2. Exit program");
         System.out.print("Choose Option: ");
         String option = sc.nextLine();
-        System.out.println("\n====================================");
+        System.out.println("\n--------------------------------------");
 
         // Option 1: Process payroll
         if (option.equals("1")) {
@@ -257,7 +256,7 @@ public class MotorPH {
             if (subOption.equals("1")) {
                 System.out.print("\nEnter Employee Number: ");
                 String employeeNo = sc.nextLine();
-                System.out.println("\n====================================\n");
+                // System.out.println("\n====================================\n");
                 oneEmployee(employeeNo); // standardized name: employeeNo
 
             // Sub-option 2: Process payroll for all employees
@@ -679,13 +678,13 @@ public class MotorPH {
                                       List<String[]> attendanceRecords,
                                       DateTimeFormatter timeFormat) {
 
-        System.out.println("\n==================================== ");
+        System.out.println("\n======================================");
         System.out.println("           Employee Payroll          ");
-        System.out.println("==================================== ");
+        System.out.println("======================================");
         System.out.println("Employee # : "    + employeeNo);
         System.out.println("Employee Name : " + lastName + ", " + firstName);
         System.out.println("Birthday : "      + birthday);
-        System.out.println("===================================\n");
+        System.out.println("======================================\n");
 
         // includes months from: June (6) to December (12) per process flow requirement
         for (int month = 6; month <= 12; month++) {
@@ -766,10 +765,10 @@ public class MotorPH {
             System.out.println("    Tax: "             + tax);
             System.out.println("Total Deductions: "    + totalDeductions);
             System.out.println("Net Salary: "          + netSalary);
-            System.out.println("-----------------------------------\n");
+            System.out.println("-------------------------------------\n");
         }
 
-        System.out.println("\n===================================");
+        System.out.println("\n=====================================");
         System.out.println("          END OF RECORD");
         System.out.println("=====================================");
     }
