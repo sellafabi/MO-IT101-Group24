@@ -75,23 +75,20 @@ public class MotorPH {
          * @return the validated username used for role identification
          */
     public static String handleLogin() {
-        // Display login interface
+
         System.out.println("\n======================================");
         System.out.println("        MotorPH Login System         ");
         System.out.println("======================================");
 
-        // Get user input
         System.out.print("\nEnter Username: ");
         String username = sc.nextLine();
 
         System.out.print("Enter Password: ");
         String inputPassword = sc.nextLine();
 
-        // Validate credentials for each role.
         boolean isEmployee     = username.equals(EMP_USERNAME)     && inputPassword.equals(PASSWORD);
         boolean isPayrollStaff = username.equals(PAYROLL_USERNAME) && inputPassword.equals(PASSWORD);
 
-        // Terminate program if credentials are invalid
         if (!isEmployee && !isPayrollStaff) {
             System.out.println("\nIncorrect username and/or password.\n");
             System.exit(0);
@@ -118,17 +115,16 @@ public class MotorPH {
          * @param birthday employee's date of birth
          */
     public static void printEmployeeInfo(String employeeNo, String lastName, String firstName, String birthday) {
-        // Display employee information header
+
         System.out.println("\n======================================");
         System.out.println( "        Employee Information");
         System.out.println("======================================");
 
-        // Output employee details
+        // Format of the employee details output
         System.out.println("\nEmployee #: " + employeeNo);
         System.out.println("Employee Name: " + lastName + ", " + firstName);
         System.out.println("Employee Birthday: " + birthday);
 
-        // Closing separator
         System.out.println("======================================\n");
     }
 
@@ -152,7 +148,6 @@ public class MotorPH {
          */
     public static void employeeMenu() {
 
-        // Display menu options
         System.out.println("\n--------------------------------------");
         System.out.println("\n1. Enter you employee number");
         System.out.println("2. Exit program");
@@ -174,11 +169,11 @@ public class MotorPH {
             // Search employee record in CSV file
             try (BufferedReader br = new BufferedReader (new FileReader (EMP_FILE))){
 
-                br.readLine(); // skip header row
+                br.readLine();
                 String employeeLine;
 
                 while ((employeeLine = br.readLine()) !=null){
-                    if(employeeLine.trim().isEmpty()) continue; // skip blank lines in the CSV file
+                    if(employeeLine.trim().isEmpty()) continue;
 
                     // Split CSV row while handling quoted values
                     String[] employeeRow = employeeLine.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
@@ -235,7 +230,6 @@ public class MotorPH {
          */
     public static void payrollMenu() {
 
-        // Display main payroll menu
         System.out.println("\n--------------------------------------");
         System.out.println("\n1. Process Payroll");
         System.out.println("2. Exit program");
@@ -268,7 +262,7 @@ public class MotorPH {
             } else if (subOption.equals("3")) {
                 System.out.println("\nExiting program.\n");
 
-            // Invalid sub-option
+            // Invalid sub-option handling
             } else {
                 System.out.println("\nInvalid option. Please enter 1, 2, or 3.\n");
             }
@@ -278,7 +272,7 @@ public class MotorPH {
             System.out.println("\nExiting program.\n");
         return;
 
-        // Invalid option
+        // Invalid option handling
         } else {
             System.out.println("\nInvalid option. Please enter 1 or 2.\n");
         }
@@ -303,11 +297,11 @@ public class MotorPH {
         // Load SSS contribution table
         try (BufferedReader br = new BufferedReader(new FileReader(SSS_FILE))) {
 
-            br.readLine(); // Skip header row
+            br.readLine();
             String sssLine;
 
             while ((sssLine = br.readLine()) != null) {
-                if (!sssLine.trim().isEmpty()) { // Skip blank lines
+                if (!sssLine.trim().isEmpty()) {
 
                     // Split CSV row while handling quoted values
                     sssTable.add(sssLine.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"));
@@ -321,11 +315,11 @@ public class MotorPH {
         // Load Pag-IBIG contribution table
         try (BufferedReader br = new BufferedReader(new FileReader(PAGIBIG_FILE))) {
 
-            br.readLine(); // Skip header row
+            br.readLine();
             String pagibigLine;
 
             while ((pagibigLine = br.readLine()) != null) {
-                if (!pagibigLine.trim().isEmpty()) { // Skip blank lines
+                if (!pagibigLine.trim().isEmpty()) {
 
                     // Split CSV row while handling quoted values
                     pagibigTable.add(pagibigLine.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"));
@@ -360,8 +354,7 @@ public class MotorPH {
         double lastEmployeeShare = 0;
         for (String[] sssRow : sssTable) {
 
-            // SSS Table Columns:
-            // [0] Range From | [1] Range To | [3] Employee Share
+            // Reads and cleans values from the data, and convert some into numbers (double) 
             double rangeFrom     = Double.parseDouble(sssRow[0].trim());
             String rangeToText   = sssRow[1].trim();
             double employeeShare = Double.parseDouble(sssRow[3].trim());
@@ -407,8 +400,7 @@ public class MotorPH {
 
             if (pagibigRow.length < 2) continue;
 
-            // Pag-IBIG Table Columns:
-            // [0] Salary Range | [1] Contribution Rate
+            // Cleans the data by removing quotes and spaces
             String salaryRange = pagibigRow[0].trim().replace("\"", "");
             String rateText    = pagibigRow[1].trim();
 
@@ -468,18 +460,12 @@ public class MotorPH {
 
         // Apply bracket-based computation
         if (monthlyGross <= 10000) {
-
-            // Fixed contribution for lowest bracket
             philhealthDeduction = 300 / 2;
 
         } else if (monthlyGross > 10000 && monthlyGross < 60000) {
-
-            // 1.5% of monthly gross (half of 3% total rate)
             philhealthDeduction =  monthlyGross*(0.03) / 2;
 
         } else if (monthlyGross >= 60000) {
-
-            // Maximum contribution cap
             philhealthDeduction = 1800 / 2;
         }
     return philhealthDeduction; 
@@ -524,22 +510,22 @@ public class MotorPH {
         
         // Apply the BIR tax bracket that matches the computed taxable salary
         if (taxableMonthlySalary <= 20832) {
-            tax = 0.00;  // Bracket 1: fully exempt — no withholding tax
+            tax = 0.00;
 
         } else if (taxableMonthlySalary >= 20833 && taxableMonthlySalary < 33333) {
-            tax = (taxableMonthlySalary-20833)*0.2;  // Bracket 2: 20% applied only to the amount exceeding the floor of 20,833
+            tax = (taxableMonthlySalary-20833)*0.2;
 
         } else if (taxableMonthlySalary >= 33333 && taxableMonthlySalary < 66667) {
-            tax = 2500+(taxableMonthlySalary-33333)*0.25; // Bracket 3: fixed base of 2,500 plus 25% on the excess over 33,333
+            tax = 2500+(taxableMonthlySalary-33333)*0.25;
 
         } else if (taxableMonthlySalary >= 66667 && taxableMonthlySalary < 166667) {
-            tax = 10833+(taxableMonthlySalary-66667)*0.30; // Bracket 4: fixed base of 10,833 plus 30% on the excess over 66,667
+            tax = 10833+(taxableMonthlySalary-66667)*0.30;
 
         } else if (taxableMonthlySalary >= 166667 && taxableMonthlySalary < 666667) {
-            tax = 40833.33+(taxableMonthlySalary-166667)*0.32; // Bracket 5: fixed base of 40,833.33 plus 32% on the excess over 166,667
+            tax = 40833.33+(taxableMonthlySalary-166667)*0.32;
 
         } else if (taxableMonthlySalary >= 666667) {
-            tax = 200833.33+(taxableMonthlySalary-666667)*0.35; // Bracket 6: fixed base of 200,833.33 plus 35% on the excess over 666,667
+            tax = 200833.33+(taxableMonthlySalary-666667)*0.35;
         }
     // Returns the final computed withholding tax amount
     return tax;
