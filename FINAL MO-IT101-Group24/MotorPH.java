@@ -25,10 +25,6 @@ public class MotorPH {
     static final String PAYROLL_USERNAME = "payroll_staff";
     static final String PASSWORD         = "12345";
 
-    // Stores SSS and Pag-IBIG bracket data loaded from CSV files at startup
-    static List<String[]> sssTable     = new ArrayList<>();
-    static List<String[]> pagibigTable = new ArrayList<>();
-
 
     /*========================================================================================
         Main Method (Method #1) [rosella]
@@ -46,13 +42,51 @@ public class MotorPH {
          * @param args command-line arguments (not used)
          */
     public static void main(String[] args) {
-        loadTables();
+
+    List<String[]> sssTable = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(SSS_FILE))) {
+
+            br.readLine();
+            String sssLine;
+
+            while ((sssLine = br.readLine()) != null) {
+                if (!sssLine.trim().isEmpty()) {
+
+                    // Split CSV row while handling quoted values
+                    sssTable.add(sssLine.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"));
+                }
+            }
+
+        } catch (IOException e) {
+            System.out.println("Error: SSS table file not found. Check that sss.csv exists in src/.");
+        }
+
+    List<String[]> pagibigTable = new ArrayList<>();
+        // Load Pag-IBIG contribution table
+        try (BufferedReader br = new BufferedReader(new FileReader(PAGIBIG_FILE))) {
+
+            br.readLine();
+            String pagibigLine;
+
+            while ((pagibigLine = br.readLine()) != null) {
+                if (!pagibigLine.trim().isEmpty()) {
+
+                    // Split CSV row while handling quoted values
+                    pagibigTable.add(pagibigLine.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"));
+                }
+            }
+            
+        } catch (IOException e) {
+            System.out.println("Error: Pag-IBIG table file not found. Check that pagibig.csv exists in src/.");
+        }
+        
         String role = handleLogin();
+        
 
         if (role.equals(EMP_USERNAME)) {
             employeeMenu();
         } else if (role.equals(PAYROLL_USERNAME)) {
-            payrollMenu();
+            payrollMenu(sssTable, pagibigTable);
         }
 
         sc.close();
@@ -104,11 +138,6 @@ public class MotorPH {
         /**
          * Displays basic employee details on the console.
          *
-         * Algorithm:
-         * 1. Prints a formatted header for the employee section.
-         * 2. Displays employee number, full name, and birthday.
-         * 3. Prints a closing separator for clarity.
-         *
          * @param employeeNo employee identification number
          * @param lastName employee's last name
          * @param firstName employee's first name
@@ -120,7 +149,6 @@ public class MotorPH {
         System.out.println( "        Employee Information");
         System.out.println("======================================");
 
-        // Format of the employee details output
         System.out.println("\nEmployee #: " + employeeNo);
         System.out.println("Employee Name: " + lastName + ", " + firstName);
         System.out.println("Employee Birthday: " + birthday);
@@ -160,13 +188,12 @@ public class MotorPH {
             System.out.print("\nEnter Your Employee Number: ");
             String employeeNo         = sc.nextLine();
                 
-            // Variables to store employee data once found
+            // Variables to hold the matched employee's fields
             String  lastName          = "";
             String  firstName         = "";
             String  birthday          = "";
             boolean isEmpDetailsFound = false;
                                 
-            // Search employee record in CSV file
             try (BufferedReader br = new BufferedReader (new FileReader (EMP_FILE))){
 
                 br.readLine();
@@ -193,7 +220,6 @@ public class MotorPH {
                 System.out.println("\nEmployee file error.\n");
             }
                 
-            // Display result
             if (isEmpDetailsFound){
                 printEmployeeInfo (employeeNo, lastName, firstName, birthday);
             } else {
@@ -228,7 +254,8 @@ public class MotorPH {
          * 4. If option 2 is selected, exits the program.
          * 5. Displays an error message for invalid input.
          */
-    public static void payrollMenu() {
+    public static void payrollMenu(List<String[]> sssTable,
+                               List<String[]> pagibigTable) {
 
         System.out.println("\n--------------------------------------");
         System.out.println("\n1. Process Payroll");
@@ -240,7 +267,6 @@ public class MotorPH {
         // Option 1: Process payroll
         if (option.equals("1")) {
 
-            // Display sub-menu options
             System.out.println("\n1. View One Employee");
             System.out.println("2. View All Employees");
             System.out.println("3. Exit program");
@@ -251,12 +277,11 @@ public class MotorPH {
             if (subOption.equals("1")) {
                 System.out.print("\nEnter Employee Number: ");
                 String employeeNo = sc.nextLine();
-                // System.out.println("\n====================================\n");
-                oneEmployee(employeeNo); // standardized name: employeeNo
+                oneEmployee(employeeNo, sssTable, pagibigTable);
 
             // Sub-option 2: Process payroll for all employees
             } else if (subOption.equals("2")) {
-                allEmployee(); // delegate payroll processing to allEmployee()
+                allEmployee(sssTable, pagibigTable); // delegate payroll processing to allEmployee()
 
             // Sub-option 3: Exit program
             } else if (subOption.equals("3")) {
@@ -278,59 +303,6 @@ public class MotorPH {
         }
     }            
     
-   
-    /*========================================================================================
-        Load Tables (Method #6) [rosella]
-    =========================================================================================*/
-
-        /**
-         * Loads SSS and Pag-IBIG contribution tables from CSV files into memory.
-         *
-         * Algorithm:
-         * 1. Opens the SSS CSV file and skips the header row.
-         * 2. Reads each line and stores non-empty rows into the SSS table list.
-         * 3. Repeats the same process for the Pag-IBIG CSV file.
-         * 4. Displays an error message if any file cannot be accessed.
-         */
-    public static void loadTables() {
-
-        // Load SSS contribution table
-        try (BufferedReader br = new BufferedReader(new FileReader(SSS_FILE))) {
-
-            br.readLine();
-            String sssLine;
-
-            while ((sssLine = br.readLine()) != null) {
-                if (!sssLine.trim().isEmpty()) {
-
-                    // Split CSV row while handling quoted values
-                    sssTable.add(sssLine.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"));
-                }
-            }
-
-        } catch (IOException e) {
-            System.out.println("Error: SSS table file not found. Check that sss.csv exists in src/.");
-        }
-
-        // Load Pag-IBIG contribution table
-        try (BufferedReader br = new BufferedReader(new FileReader(PAGIBIG_FILE))) {
-
-            br.readLine();
-            String pagibigLine;
-
-            while ((pagibigLine = br.readLine()) != null) {
-                if (!pagibigLine.trim().isEmpty()) {
-
-                    // Split CSV row while handling quoted values
-                    pagibigTable.add(pagibigLine.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"));
-                }
-            }
-            
-        } catch (IOException e) {
-            System.out.println("Error: Pag-IBIG table file not found. Check that pagibig.csv exists in src/.");
-        }
-    }
-
 
     /*========================================================================================
         SSS Computation (Method #7) [rosella]
@@ -348,13 +320,13 @@ public class MotorPH {
          * @param monthlyGross combined gross salary for the month
          * @return employee's SSS contribution
          */
-    public static double computeSSS(double monthlyGross) {
+    public static double computeSSS(double monthlyGross, List<String[]> sssTable) {
 
         // Stores last valid employee share as fallback
         double lastEmployeeShare = 0;
         for (String[] sssRow : sssTable) {
 
-            // Reads and cleans values from the data, and convert some into numbers (double) 
+            // Columns: [0] rangeFrom, [1] rangeTo (or "Over"), [3] employee share
             double rangeFrom     = Double.parseDouble(sssRow[0].trim());
             String rangeToText   = sssRow[1].trim();
             double employeeShare = Double.parseDouble(sssRow[3].trim());
@@ -366,13 +338,12 @@ public class MotorPH {
                 if (monthlyGross >= rangeFrom) return employeeShare;
             } else {
                 double rangeTo = Double.parseDouble(rangeToText);
-                // Check if salary falls within range
                 if (monthlyGross >= rangeFrom && monthlyGross <= rangeTo) {
                     return employeeShare;
                 }
             }
         }
-    return lastEmployeeShare; 
+        return lastEmployeeShare; 
     }
 
 
@@ -392,7 +363,7 @@ public class MotorPH {
          * @param monthlyGross combined gross salary for the month
          * @return employee's Pag-IBIG contribution (capped at PHP 100.00)
          */
-    public static double computePagibig(double monthlyGross) {
+    public static double computePagibig(double monthlyGross, List<String[]> pagibigTable) {
 
         double contribution = 0;
 
@@ -434,8 +405,8 @@ public class MotorPH {
                 }
             }
         }
-    // Apply maximum contribution cap (PHP 100.00)
-    return Math.min(contribution, 100);
+        // Apply maximum contribution cap (PHP 100.00)
+        return Math.min(contribution, 100);
     }
 
 
@@ -458,7 +429,6 @@ public class MotorPH {
 
         double philhealthDeduction = 0.0;
 
-        // Apply bracket-based computation
         if (monthlyGross <= 10000) {
             philhealthDeduction = 300 / 2;
 
@@ -468,7 +438,7 @@ public class MotorPH {
         } else if (monthlyGross >= 60000) {
             philhealthDeduction = 1800 / 2;
         }
-    return philhealthDeduction; 
+        return philhealthDeduction; 
     }
 
 
@@ -499,16 +469,16 @@ public class MotorPH {
         *
         * @param monthlyGross      the combined gross salary of both cutoffs for the month
         * @param totalContribution the total of SSS + PhilHealth + Pag-IBIG contributions
-        * @return the computed withholding tax amount
+        * @return                  the computed withholding tax amount
         */
-
     public static double withholdingTax (double totalGross, double totalContribution) {
+
         double tax = 0.00;
 
-        // Withholding tax is applied after deducting the mandatory contributions to the monthly gross, leaving only the taxable salary.
+        // Contributions are subtracted first; tax is applied only to the remaining taxable amount
         double taxableMonthlySalary = totalGross - totalContribution; 
         
-        // Apply the BIR tax bracket that matches the computed taxable salary
+        // Match taxable salary against BIR brackets
         if (taxableMonthlySalary <= 20832) {
             tax = 0.00;
 
@@ -527,8 +497,7 @@ public class MotorPH {
         } else if (taxableMonthlySalary >= 666667) {
             tax = 200833.33+(taxableMonthlySalary-666667)*0.35;
         }
-    // Returns the final computed withholding tax amount
-    return tax;
+        return tax;
     }  
 
 
@@ -570,7 +539,7 @@ public class MotorPH {
         final LocalTime STANDARD_START = LocalTime.of(8,  0); // official workday start
         
         final LocalTime CUTOFF_TIME    = LocalTime.of(17, 0); // official workday end
-        final int       LUNCH_BREAK    = 60;                  // unpaid break in minutes
+        final int       LUNCH_BREAK    = 60;                               // unpaid break in minutes
 
         // Guard against corrupted or reversed time entries in the CSV
         if (logOut.isBefore(logIn)) {
@@ -587,7 +556,6 @@ public class MotorPH {
             logIn = STANDARD_START;
         }
 
-        // Calculate total minutes worked between login and logout times
         long minutesWorked = Duration.between(logIn, logOut).toMinutes();
 
         // Rule 3: Subtract the mandatory lunch break; if 60 min or less was logged, result is 0
@@ -596,8 +564,8 @@ public class MotorPH {
         } else {
             minutesWorked = 0;
         }
-    // Convert minutes to hours
-    return minutesWorked / 60.0;      
+        // Convert minutes to hours
+        return minutesWorked / 60.0;      
     }
 
 
@@ -615,7 +583,7 @@ public class MotorPH {
          *
          * @param hours total hours worked during the cutoff period
          * @param rate  employee's hourly rate (column 18 of details.csv)
-         * @return gross salary for the cutoff period
+         * @return      gross salary for the cutoff period
          */
     static double computeGross(double hours, double rate) {
         return hours * rate;
@@ -657,7 +625,9 @@ public class MotorPH {
     public static void processPayroll(String employeeNo, String lastName, String firstName,
                                       String birthday, double rate,
                                       List<String[]> attendanceRecords,
-                                      DateTimeFormatter timeFormat) {
+                                      DateTimeFormatter timeFormat,
+                                      List<String[]> sssTable,
+                                      List<String[]> pagibigTable) {
 
         System.out.println("\n======================================");
         System.out.println("           Employee Payroll          ");
@@ -670,90 +640,147 @@ public class MotorPH {
         // includes months from: June (6) to December (12) per process flow requirement
         for (int month = 6; month <= 12; month++) {
 
-            double firstHalf  = 0; // hours worked days 1–15
-            double secondHalf = 0; // hours worked days 16–end
-
-            // lengthOfMonth() gives the correct last day (e.g., 30 for June, 31 for July)
-            int daysInMonth = YearMonth.of(2024, month).lengthOfMonth();
-
-            for (String[] attData : attendanceRecords) {
-
-                if (!attData[0].equals(employeeNo)) continue; // Column 0 contains the employee number
-
-                // Column 3 is the date in MM/DD/YYYY format — split to get month, day, and year
-                String[] dateParts   = attData[3].split("/");
-                int      recordMonth = Integer.parseInt(dateParts[0]);
-                int      day         = Integer.parseInt(dateParts[1]);
-                int      year        = Integer.parseInt(dateParts[2]);
-
-                if (year != 2024 || recordMonth != month) continue;
-
-                // Column 4 = login time, Column 5 = logout time — both in H:mm format
-                LocalTime login  = LocalTime.parse(attData[4].trim(), timeFormat);
-                LocalTime logout = LocalTime.parse(attData[5].trim(), timeFormat);
-
-                double hours = computeHoursWorked(login, logout);
-
-                if (day <= 15) firstHalf  += hours; // days 1–15:   first cutoff
-                else           secondHalf += hours; // days 16–end of the month: second cutoff
-            }
-
-            // Compute gross salary for the first and second cut-off.
-            double grossFirst  = computeGross(firstHalf,  rate);
-            double grossSecond = computeGross(secondHalf, rate);
-
-            // Deductions are based on the combined monthly gross, not per-cutoff gross
-            double monthlyGross = grossFirst + grossSecond;
-            double sss          = computeSSS(monthlyGross);
-            double pagibig      = computePagibig(monthlyGross);
-            double philhealth   = computePhilhealth(monthlyGross);
-
-            // BIR rule: contributions must be deducted from gross before tax is computed
-            double totalContribution = sss + philhealth + pagibig;
-            double tax               = withholdingTax(monthlyGross, totalContribution);
-            double totalDeductions   = sss + pagibig + philhealth + tax;
-
-            // Deductions are applied on the second cutoff payout only, per process flow.
-            double netSalary = grossSecond - totalDeductions;
-
-            // Convert numeric month (6-12) to its name; otherwise, returns to the default label
-            String monthName = switch (month) {
-                case 6  -> "June";
-                case 7  -> "July";
-                case 8  -> "August";
-                case 9  -> "September";
-                case 10 -> "October";
-                case 11 -> "November";
-                case 12 -> "December";
-                default -> "Month " + month;
-            };
-
-            // First cutoff — no deductions; net equals gross
-            System.out.println("\nFirst Cutoff");
-            System.out.println("\nCutoff Date: "       + monthName + " 1 to 15");
-            System.out.println("Total Hours Worked : " + firstHalf);
-            System.out.println("Gross Salary: "        + grossFirst);
-            System.out.println("Net Salary: "          + grossFirst);
-
-            // Second cutoff — all four government deductions are applied here
-            System.out.println("\nSecond Cutoff");
-            System.out.println("\nCutoff Date: "       + monthName + " 16 to " + daysInMonth);
-            System.out.println("Total Hours Worked : " + secondHalf);
-            System.out.println("Gross Salary: "        + grossSecond);
-            System.out.println("    SSS: "             + sss);
-            System.out.println("    PhilHealth: "      + philhealth);
-            System.out.println("    Pag-IBIG: "        + pagibig);
-            System.out.println("    Tax: "             + tax);
-            System.out.println("Total Deductions: "    + totalDeductions);
-            System.out.println("Net Salary: "          + netSalary);
-            System.out.println("-------------------------------------\n");
+            double[] result = computeMonthlyPayroll(
+                employeeNo, month, rate, attendanceRecords, timeFormat, sssTable, pagibigTable
+            );
+            
+            printMonthlyPayroll(month, result);
         }
 
         System.out.println("\n=====================================");
         System.out.println("          END OF RECORD");
         System.out.println("=====================================");
     }
-              
+
+
+    public static double[] computeMonthlyPayroll( String employeeNo, int month, double rate,
+                                                    List<String[]> attendanceRecords,
+                                                    DateTimeFormatter timeFormat,
+                                                    List<String[]> sssTable,
+                                                    List<String[]> pagibigTable) {
+
+        double firstHalf  = 0; // hours worked days 1–15
+        double secondHalf = 0; // hours worked days 16–end
+
+        // lengthOfMonth() gives the correct last day (e.g., 30 for June, 31 for July)
+        int daysInMonth = YearMonth.of(2024, month).lengthOfMonth();
+
+        for (String[] attData : attendanceRecords) {
+
+            // Skip malformed rows with missing columns
+            if (attData.length < 6) {
+                System.out.println("Skipping invalid attendance row: " + java.util.Arrays.toString(attData));
+                continue;
+            }
+
+            if (!attData[0].equals(employeeNo)) continue; // Column 0 contains the employee number
+
+            // Column 3 is the date in MM/DD/YYYY format — split to get month, day, and year
+            String[] dateParts   = attData[3].split("/");
+            int recordMonth, day, year;
+
+            try {
+                recordMonth = Integer.parseInt(dateParts[0]);
+                day         = Integer.parseInt(dateParts[1]);
+                year        = Integer.parseInt(dateParts[2]);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid date format: " + java.util.Arrays.toString(attData));
+                continue;
+            }
+
+            if (year != 2024 || recordMonth != month) continue;
+
+            LocalTime login, logout;
+
+            try {
+                login  = LocalTime.parse(attData[4].trim(), timeFormat);
+                logout = LocalTime.parse(attData[5].trim(), timeFormat);
+            } catch (Exception e) {
+                System.out.println("Invalid time format: " + java.util.Arrays.toString(attData));
+                continue;
+            }
+
+            double hours = computeHoursWorked(login, logout);
+
+            if (day <= 15) firstHalf  += hours; // days 1–15:   first cutoff
+            else           secondHalf += hours; // days 16–end of the month: second cutoff
+        }
+
+        // Compute gross salary for the first and second cut-off.
+        double grossFirst  = computeGross(firstHalf,  rate);
+        double grossSecond = computeGross(secondHalf, rate);
+
+        // Deductions are based on the combined monthly gross, not per-cutoff gross
+        double monthlyGross = grossFirst + grossSecond;
+        double sss          = computeSSS(monthlyGross, sssTable);
+        double pagibig      = computePagibig(monthlyGross, pagibigTable);
+        double philhealth   = computePhilhealth(monthlyGross);
+
+        // BIR rule: contributions must be deducted from gross before tax is computed
+        double totalContribution = sss + philhealth + pagibig;
+        double tax               = withholdingTax(monthlyGross, totalContribution);
+        double totalDeductions   = sss + pagibig + philhealth + tax;
+
+        // Deductions are applied on the second cutoff payout only, per process flow.
+        double netSalary = grossSecond - totalDeductions;
+
+        return new double[] {
+            firstHalf, secondHalf,
+            grossFirst, grossSecond,
+            sss, philhealth, pagibig, tax,
+            totalDeductions, netSalary,
+            daysInMonth
+        };
+    }    
+
+
+    public static void printMonthlyPayroll(int month, double[] data) {
+
+        // Convert numeric month (6-12) to its name; otherwise, returns to the default label
+        String monthName = switch (month) {
+            case 6  -> "June";
+            case 7  -> "July";
+            case 8  -> "August";
+            case 9  -> "September";
+            case 10 -> "October";
+            case 11 -> "November";
+            case 12 -> "December";
+            default -> "Month " + month;
+        };
+
+        double firstHalf        = data[0];
+        double secondHalf       = data[1];
+        double grossFirst       = data[2];
+        double grossSecond      = data[3];
+        double sss              = data[4];
+        double philhealth       = data[5];
+        double pagibig          = data[6];
+        double tax              = data[7];
+        double totalDeductions  = data[8];
+        double netSalary        = data[9];
+        int daysInMonth         = (int) data[10];
+
+        // First cutoff — no deductions; net equals gross
+        System.out.println("\nFirst Cutoff");
+        System.out.println("\nCutoff Date: "       + monthName + " 1 to 15");
+        System.out.println("Total Hours Worked : " + firstHalf);
+        System.out.println("Gross Salary: "        + grossFirst);
+        System.out.println("Net Salary: "          + grossFirst);
+
+        // Second cutoff — all four government deductions are applied here
+        System.out.println("\nSecond Cutoff");
+        System.out.println("\nCutoff Date: "       + monthName + " 16 to " + daysInMonth);
+        System.out.println("Total Hours Worked : " + secondHalf);
+        System.out.println("Gross Salary: "        + grossSecond);
+        System.out.println("    SSS: "             + sss);
+        System.out.println("    PhilHealth: "      + philhealth);
+        System.out.println("    Pag-IBIG: "        + pagibig);
+        System.out.println("    Tax: "             + tax);
+        System.out.println("Total Deductions: "    + totalDeductions);
+        System.out.println("Net Salary: "          + netSalary);
+        System.out.println("-------------------------------------\n");
+    }
+
         
     /*========================================================================================
         For One Employee (Method #14) [rosella]
@@ -776,7 +803,7 @@ public class MotorPH {
          *
          * @param employeeNo the employee number entered by the payroll staff
          */
-    public static void oneEmployee(String employeeNo) {
+    public static void oneEmployee(String employeeNo, List<String[]> sssTable, List<String[]> pagibigTable) {
 
         // H:mm handles both single-digit (e.g., 8:05) and double-digit hours (e.g., 17:00)
         DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
@@ -835,8 +862,7 @@ public class MotorPH {
             System.out.println("Error reading attendance file.");
         }
 
-        // calls the method that computes and displays full payroll report of the employee
-        processPayroll(employeeNo, lastName, firstName, birthday, rate, attendanceRecords, timeFormat);
+        processPayroll(employeeNo, lastName, firstName, birthday, rate, attendanceRecords, timeFormat, sssTable, pagibigTable);
     }
 
 
@@ -861,7 +887,7 @@ public class MotorPH {
          *
          * This method takes no parameters because it processes all employees by design.
          */
-    public static void allEmployee() {
+    public static void allEmployee(List<String[]> sssTable, List<String[]> pagibigTable) {
 
         // H:mm handles both single-digit (e.g., 8:05) and double-digit hours (e.g., 17:00)
         DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
@@ -907,7 +933,7 @@ public class MotorPH {
             double    rate         = Double.parseDouble(empData[18].trim()); // Column 18: Hourly Rate
 
             // calls the method that computes and displays full payroll report of the employees
-            processPayroll(employeeNo, lastName, firstName, birthday, rate, attendanceRecords, timeFormat);
+            processPayroll(employeeNo, lastName, firstName, birthday, rate, attendanceRecords, timeFormat, sssTable, pagibigTable);
         }
     }
 }
