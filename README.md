@@ -4,8 +4,8 @@
 
 | Name | Contribution |
 |------|-------------|
-| Rosella Fabillar | SSS computation, Pag-IBIG computation, Payroll computation & display, View One Employee, View All Employees |
-| Ann Margarette Pascual | Main method & login system, PhilHealth computation, Withholding tax computation, Hours worked computation, Gross salary computation |
+| Rosella Fabillar | Main method, SSS computation, Pag-IBIG computation, Payroll computation & display, View One Employee, View All Employees |
+| Ann Margarette Pascual | Login system, Print employee info, Employee menu, Payroll menu, PhilHealth computation, Withholding tax computation, Hours worked computation, Gross salary computation |
 
 ---
 
@@ -69,9 +69,9 @@ Three rules are applied per attendance record:
 
 ### PhilHealth (`computePhilhealth`)
 - Fixed-rate brackets based on combined monthly gross:
-  - Monthly gross ≤ PHP 10,000 → Fixed PHP 150.00
-  - Monthly gross PHP 10,001–59,999 → 1.5% of monthly gross
-  - Monthly gross ≥ PHP 60,000 → Fixed PHP 900.00
+  - Monthly gross ≤ PHP 10,000 → Fixed PHP 150.00 (employee share)
+  - Monthly gross PHP 10,001–59,999 → 3% of monthly gross; employee pays half (1.5%)
+  - Monthly gross ≥ PHP 60,000 → Fixed PHP 900.00 (employee share)
 - Employee pays only half of the total premium
 
 ### Withholding Tax (`withholdingTax`)
@@ -115,16 +115,22 @@ For each month (June–December), each employee's report displays:
 
 | Method | Role | Contributor |
 |--------|------|-------------|
-| `main()` | Login system and menu routing | Ann |
+| `main()` | Entry point — loads SSS and Pag-IBIG tables, triggers login, routes to menu | Rosella |
+| `handleLogin()` | Login system — validates credentials and returns user role | Ann |
+| `printEmployeeInfo()` | Displays employee number, name, and birthday on the console | Ann |
+| `employeeMenu()` | Employee menu — prompts for employee number and displays matching record | Ann |
+| `payrollMenu()` | Payroll staff menu — routes to one-employee or all-employees payroll processing | Ann |
 | `computeSSS()` | SSS contribution lookup from bracket table | Rosella |
 | `computePagibig()` | Pag-IBIG contribution with PHP 100 cap | Rosella |
 | `computePhilhealth()` | PhilHealth contribution by salary bracket | Ann |
 | `withholdingTax()` | BIR withholding tax by 6-bracket table | Ann |
 | `computeHoursWorked()` | Daily hours with grace period, OT cap, lunch deduction | Ann |
 | `computeGross()` | Gross salary = hours × hourly rate | Ann |
-| `processPayroll()` | Full payroll computation and display (June–December) | Rosella |
-| `oneEmployee()` | Loads and processes payroll for a single employee | Rosella |
-| `allEmployee()` | Loads and processes payroll for all employees | Rosella |
+| `computeMonthlyPayroll()` | Computes all payroll figures (hours, gross, deductions, net) for one month | Rosella |
+| `printMonthlyPayroll()` | Formats and prints the first and second cutoff report for one month | Rosella |
+| `processPayroll()` | Loops June–December, delegates to computeMonthlyPayroll() and printMonthlyPayroll() | Rosella |
+| `oneEmployee()` | Loads employee and attendance data, then calls processPayroll() for one employee | Rosella |
+| `allEmployee()` | Loads all employees and attendance data once, then calls processPayroll() for each | Rosella |
 
 ---
 
