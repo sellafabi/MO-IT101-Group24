@@ -141,3 +141,11 @@ For each month (June–December), each employee's report displays:
 ## Project Progress Documentation Log
 
 [View Project Progress Documentation Log](https://docs.google.com/spreadsheets/d/1nOglg-Bu7eLWkUNbUG-aD5LpB2aPPZ5IaRWzEvQpfC4/edit?gid=1606705204#gid=1606705204)
+
+## Quality Assurance Testing
+
+The folder includes: 
+1. Test Cases & Sample Outputs from the Console
+2. Quality Assurance Testing by the partner group: Group 23
+
+[View Quality Assurance Testing Folder](https://drive.google.com/drive/folders/1dgKhgOQxk0jizXxkIjViPEP_00b3Glra?usp=sharing)
