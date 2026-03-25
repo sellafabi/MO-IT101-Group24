@@ -131,3 +131,7 @@ For each month (June–December), each employee's report displays:
 ## Project Plan
 
 [View Project Plan](https://docs.google.com/spreadsheets/d/1nOglg-Bu7eLWkUNbUG-aD5LpB2aPPZ5IaRWzEvQpfC4/edit?gid=2134013708#gid=2134013708)
+
+## Project Progress Documentation Log
+
+[View Project Progress Documentation Log](https://docs.google.com/spreadsheets/d/1nOglg-Bu7eLWkUNbUG-aD5LpB2aPPZ5IaRWzEvQpfC4/edit?gid=1606705204#gid=1606705204)
