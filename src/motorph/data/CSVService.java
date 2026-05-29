@@ -8,11 +8,12 @@ import java.util.List;
 
 public class CSVService {
 
-    static final String SSS_FILE         = "src/sss.csv";
-    static final String PAGIBIG_FILE     = "src/pagibig.csv";
+    static final String SSS_FILE         = "src/motorph/resources/sss.csv";
+    static final String PAGIBIG_FILE     = "src/motorph/resources/pagibig.csv";
 
     public static List<String[]> SSSTable() {
         List<String[]> sssTable = new ArrayList<>();
+
         try (BufferedReader br = new BufferedReader(new FileReader(SSS_FILE))) {
 
             br.readLine();
@@ -34,6 +35,7 @@ public class CSVService {
 
     public static List<String[]> pagibigTable() {
         List<String[]> pagibigTable = new ArrayList<>();
+
         // Load Pag-IBIG contribution table
         try (BufferedReader br = new BufferedReader(new FileReader(PAGIBIG_FILE))) {
 

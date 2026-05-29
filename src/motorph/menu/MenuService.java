@@ -13,7 +13,7 @@ public class MenuService {
     // Shared Scanner instance used across all methods for user input
     static Scanner sc = new Scanner(System.in);
 
-    static final String EMP_FILE         = "src/details.csv";
+    static final String EMP_FILE         = "src/motorph/resources/details.csv";
 
     /*========================================================================================
         Employee Menu (Method #4) [ann]
