@@ -1,4 +1,6 @@
 package motorph.payroll;
+import motorph.report.ReportPrinter;
+
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -8,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PayrollService {
+
+    static final String EMP_FILE = "src/details.csv";
+    static final String ATT_FILE = "src/attendance.csv";
 
     /*========================================================================================
         Payroll Computation and Display (Method #13) [rosella]
@@ -59,11 +64,11 @@ public class PayrollService {
         // includes months from: June (6) to December (12) per process flow requirement
         for (int month = 6; month <= 12; month++) {
 
-            double[] result = computeMonthlyPayroll(
+            double[] result = PayrollCalculator.computeMonthlyPayroll(
                 employeeNo, month, rate, attendanceRecords, timeFormat, sssTable, pagibigTable
             );
             
-            printMonthlyPayroll(month, result);
+            ReportPrinter.printMonthlyPayroll(month, result);
         }
 
         System.out.println("\n=====================================");

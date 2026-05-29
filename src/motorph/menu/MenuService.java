@@ -1,4 +1,6 @@
 package motorph.menu;
+import motorph.report.ReportPrinter;
+import motorph.payroll.PayrollService;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -77,7 +79,7 @@ public class MenuService {
             }
                 
             if (isEmpDetailsFound){
-                printEmployeeInfo (employeeNo, lastName, firstName, birthday);
+                ReportPrinter.printEmployeeInfo (employeeNo, lastName, firstName, birthday);
             } else {
                 System.out.println("\nEmployee number does not exist.\n");
             }
@@ -132,11 +134,11 @@ public class MenuService {
             if (subOption.equals("1")) {
                 System.out.print("\nEnter Employee Number: ");
                 String employeeNo = sc.nextLine();
-                oneEmployee(employeeNo, sssTable, pagibigTable);
+                PayrollService.oneEmployee(employeeNo, sssTable, pagibigTable);
 
             // Sub-option 2: Process payroll for all employees
             } else if (subOption.equals("2")) {
-                allEmployee(sssTable, pagibigTable); // delegate payroll processing to allEmployee()
+                PayrollService.allEmployee(sssTable, pagibigTable); // delegate payroll processing to allEmployee()
 
             // Sub-option 3: Exit program
             } else if (subOption.equals("3")) {

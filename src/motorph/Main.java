@@ -1,12 +1,12 @@
 package motorph;
+import motorph.menu.MenuService;
+import motorph.authenticator.AuthService;
+
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.time.Duration;
-import java.time.LocalTime;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -45,7 +45,7 @@ public class Main {
          */
     public static void main(String[] args) {
 
-    List<String[]> sssTable = new ArrayList<>();
+        List<String[]> sssTable = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(SSS_FILE))) {
 
             br.readLine();
@@ -63,7 +63,7 @@ public class Main {
             System.out.println("Error: SSS table file not found. Check that sss.csv exists in src/.");
         }
 
-    List<String[]> pagibigTable = new ArrayList<>();
+        List<String[]> pagibigTable = new ArrayList<>();
         // Load Pag-IBIG contribution table
         try (BufferedReader br = new BufferedReader(new FileReader(PAGIBIG_FILE))) {
 
@@ -82,13 +82,13 @@ public class Main {
             System.out.println("Error: Pag-IBIG table file not found. Check that pagibig.csv exists in src/.");
         }
         
-        String role = handleLogin();
+        String role = AuthService.handleLogin();
         
 
         if (role.equals(EMP_USERNAME)) {
-            employeeMenu();
+            MenuService.employeeMenu();
         } else if (role.equals(PAYROLL_USERNAME)) {
-            payrollMenu(sssTable, pagibigTable);
+            MenuService.payrollMenu(sssTable, pagibigTable);
         }
 
         sc.close();

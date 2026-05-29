@@ -4,6 +4,7 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.time.Duration;
 
 public class PayrollCalculator {
 
@@ -292,7 +293,7 @@ public class PayrollCalculator {
         return hours * rate;
     }
 
-        public static double[] computeMonthlyPayroll( String employeeNo, int month, double rate,
+    public static double[] computeMonthlyPayroll( String employeeNo, int month, double rate,
                                                     List<String[]> attendanceRecords,
                                                     DateTimeFormatter timeFormat,
                                                     List<String[]> sssTable,

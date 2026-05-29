@@ -1,6 +1,7 @@
 {
     "java.project.sourcePaths": [
-        "FINAL MO-IT101-Group24"
+        "FINAL MO-IT101-Group24",
+        "src"
     ],
     "java.project.referencedLibraries": []
 }
