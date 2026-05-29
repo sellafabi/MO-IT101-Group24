@@ -3,6 +3,8 @@ import motorph.menu.MenuService;
 import motorph.authenticator.AuthService;
 import motorph.data.CSVService;
 
+import motorph.gui.LoginFrame;
+
 
 import java.util.List;
 import java.util.Scanner;
@@ -38,16 +40,18 @@ public class Main {
          */
     public static void main(String[] args) {
 
-        List<String[]> sssTable = CSVService.SSSTable();
-        List<String[]> pagibigTable = CSVService.pagibigTable();
+        // List<String[]> sssTable = CSVService.SSSTable();
+        // List<String[]> pagibigTable = CSVService.pagibigTable();
         
-        String role = AuthService.handleLogin();
+        // String role = AuthService.handleLogin();
         
 
-        if (role.equals(EMP_USERNAME)) {
-            MenuService.employeeMenu();
-        } else if (role.equals(PAYROLL_USERNAME)) {
-            MenuService.payrollMenu(sssTable, pagibigTable);
-        }
+        // if (role.equals(EMP_USERNAME)) {
+        //     MenuService.employeeMenu();
+        // } else if (role.equals(PAYROLL_USERNAME)) {
+        //     MenuService.payrollMenu(sssTable, pagibigTable);
+        // }
+
+        new LoginFrame();
     }
 }
