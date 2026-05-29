@@ -11,8 +11,8 @@ import java.util.List;
 
 public class PayrollService {
 
-    static final String EMP_FILE = "src/details.csv";
-    static final String ATT_FILE = "src/attendance.csv";
+    static final String EMP_FILE = "src/motorph/resources/details.csv";
+    static final String ATT_FILE = "src/motorph/resources/attendance.csv";
 
     /*========================================================================================
         Payroll Computation and Display (Method #13) [rosella]
