@@ -152,4 +152,4 @@ The folder includes:
 
 ##  Class Diagram Worksheet
 
-[View Class Diagram Worksheet] (https://docs.google.com/spreadsheets/d/1EtZxj1IauriG62v1sE94TJjqLg-hQYppYwb7iG7-UOU/edit?usp=sharing) 
+[View Class Diagram Worksheet](https://docs.google.com/spreadsheets/d/1EtZxj1IauriG62v1sE94TJjqLg-hQYppYwb7iG7-UOU/edit?usp=sharing) 
