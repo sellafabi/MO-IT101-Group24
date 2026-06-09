@@ -149,3 +149,7 @@ The folder includes:
 2. Quality Assurance Testing by the partner group: Group 23
 
 [View Quality Assurance Testing Folder](https://drive.google.com/drive/folders/1dgKhgOQxk0jizXxkIjViPEP_00b3Glra?usp=sharing)
+
+##  Class Diagram Worksheet
+
+[View Class Diagram Worksheet] (https://docs.google.com/spreadsheets/d/1EtZxj1IauriG62v1sE94TJjqLg-hQYppYwb7iG7-UOU/edit?usp=sharing) 
